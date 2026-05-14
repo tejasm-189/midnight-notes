@@ -170,6 +170,26 @@ notes/
 └── Cargo.toml
 ```
 
+## Testing
+
+```bash
+# Run all tests (unit + integration)
+cargo test
+
+# Run integration tests only
+cargo test --test integration
+
+# Run specific test
+cargo test test_note_lifecycle
+
+# Run tests with output
+cargo test -- --nocapture
+
+# Code coverage (install tarpaulin first)
+# cargo install cargo-tarpaulin
+# cargo tarpaulin --ignore-tests
+```
+
 ## Getting Started
 
 ```bash

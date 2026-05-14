@@ -1,6 +1,13 @@
 use pulldown_cmark::{html, Event, Options, Parser};
 
 /// Render markdown text to HTML for display.
+///
+/// ```
+/// use midnight_notes::core::markdown::render_markdown;
+/// let html = render_markdown("# Hello\n**world**");
+/// assert!(html.contains("<h1>"));
+/// assert!(html.contains("<strong>"));
+/// ```
 pub fn render_markdown(text: &str) -> String {
     let mut options = Options::empty();
     options.insert(Options::ENABLE_TABLES);

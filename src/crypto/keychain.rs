@@ -34,6 +34,13 @@ const TIME_COST: u32 = 3;
 const PARALLELISM: u32 = 4;
 
 /// Derive a 256-bit encryption key from a master password using Argon2id.
+///
+/// ```
+/// use midnight_notes::crypto::keychain::{derive_key, generate_salt};
+/// let salt = generate_salt();
+/// let key = derive_key("my password", &salt).unwrap();
+/// assert_eq!(key.len(), 32);
+/// ```
 pub fn derive_key(password: &str, salt: &[u8]) -> Result<[u8; KEY_LENGTH], KeychainError> {
     let params = Params::new(MEMORY_COST, TIME_COST, PARALLELISM, Some(KEY_LENGTH))?;
     let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
