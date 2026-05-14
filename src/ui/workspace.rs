@@ -14,7 +14,7 @@ const NAV_ITEM_ACTIVE: &str = "display: flex; align-items: center; gap: 12px; pa
     background: #2a2a2a;";
 
 #[component]
-pub fn Workspace(on_lock: EventHandler<()>) -> Element {
+pub fn Workspace(on_lock: EventHandler<()>, on_open_settings: EventHandler<()>) -> Element {
     let mut mode = use_signal(|| "Prose");
 
     rsx! {
@@ -55,7 +55,15 @@ pub fn Workspace(on_lock: EventHandler<()>) -> Element {
                     NavItem { icon: "archive", label: "Archived", active: false }
                     NavItem { icon: "delete", label: "Trash", active: false }
                     NavItem { icon: "lock", label: "Encrypted", active: false }
-                    NavItem { icon: "settings", label: "Settings", active: false }
+                    a {
+                        style: "display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+                                font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500;
+                                letter-spacing: 0.05em; color: #b9cacb; cursor: pointer; border-left: 2px solid transparent;
+                                transition: all 0.15s; cursor: pointer;",
+                        onclick: move |_| on_open_settings.call(()),
+                        span { class: "material-symbols-outlined", style: "font-size: 18px;", "settings" }
+                        span { "Settings" }
+                    }
                 }
 
                 // Bottom nav

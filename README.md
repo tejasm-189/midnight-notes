@@ -206,7 +206,7 @@ cargo tauri build
 | 4 | Multi-mode editor (prose/code/vim), slash commands, KaTeX math | ✅ Done |
 | 5 | Version history + diff, encrypted exports, attachment blobs | ✅ Done |
 | 6 | WASM plugin system, file watching (notify), biometric lock | ✅ Done |
-| 7 | Theming (light/dark/midnight), pinning, archiving, polish | 📋 Planned |
+| 7 | Theming (light/dark/midnight), settings UI, polish | ✅ Done |
 | 8 | Cross-platform testing, performance optimization, release | 📋 Planned |
 
 ## Security Model

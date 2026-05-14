@@ -13,24 +13,23 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 | `workspace.rs` | ✅ done | Main workspace (sidebar, note list, editor with mode switcher) |
 | `viewer.rs` | 📋 planned | Note viewer/reader |
 | `search.rs` | 📋 planned | Search bar + results display |
-| `settings.rs` | 📋 planned | Settings panel |
-| `theme.rs` | 📋 planned | Theme switcher logic |
+| `settings.rs` | ✅ done | Settings panel with theme switcher (Midnight/Dark/Light) |
+| `theme.rs` | ✅ done | Theme provider system, CSS custom properties, 3 themes |
 
 ## Sub-folders
 
 | Folder | Status | Description |
 |--------|--------|-------------|
-| `editor/` | 📋 planned | Multi-mode editor components |
+| `editor/` | ✅ done | Multi-mode editor components |
 | `sidebar/` | 📋 planned | Navigation sidebar components |
 
 ## Progress
-- [x] Root component with routing (VaultLock ↔ Workspace)
-- [x] Vault lock screen (matches `docs/Design/vault-lock.html`)
-- [x] Main workspace shell (sidebar, note list, editor)
-- [ ] Note viewer
+- [x] Root component with routing (VaultLock ↔ Workspace ↔ Settings)
+- [x] Vault lock screen
+- [x] Main workspace shell
+- [x] Settings screen with theme selector
+- [x] Theme system: 3 themes (Midnight/Dark/Light) via CSS custom properties
 - [ ] Search/Smart Views screen
-- [ ] Settings screen
-- [ ] Theme system
 
 ## Notes
 - Follow the Midnight design system in `DESIGN.md`
