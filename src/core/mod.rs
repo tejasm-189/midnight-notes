@@ -1,6 +1,7 @@
 pub mod backlinks;
 pub mod export;
 pub mod history;
+pub mod markdown;
 pub mod note;
 pub mod plugin;
 pub mod search;

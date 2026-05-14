@@ -10,6 +10,7 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 | `mod.rs` | ✅ done | Module root, error types |
 | `note.rs` | ✅ done | Note CRUD service (create, read, update, delete, trash, pin, archive, FTS5 search) |
 | `tag.rs` | ✅ done | Tag CRUD + tree operations + note-tag assignment |
+| `markdown.rs` | ✅ done | Markdown renderer (pulldown-cmark), plain text extractor, link parser |
 | `search.rs` | ✅ done | FTS5 search with tag:/has:todo/path: filters + smart views |
 | `backlinks.rs` | ✅ done | [[Note]] backlink extraction, resolution, linked mentions |
 | `history.rs` | 📋 planned | Version snapshots + diff |
