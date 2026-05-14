@@ -207,7 +207,7 @@ cargo tauri build
 | 5 | Version history + diff, encrypted exports, attachment blobs | ✅ Done |
 | 6 | WASM plugin system, file watching (notify), biometric lock | ✅ Done |
 | 7 | Theming (light/dark/midnight), settings UI, polish | ✅ Done |
-| 8 | Cross-platform testing, performance optimization, release | 📋 Planned |
+| 8 | CI pipeline (GitHub Actions), release profile, cross-compile config | ✅ Done |
 
 ## Security Model
 

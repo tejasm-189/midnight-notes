@@ -1,2 +1,16 @@
 [target.x86_64-unknown-linux-gnu]
 rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[target.aarch64-unknown-linux-gnu]
+# For cross-compiling to ARM Linux (e.g. Raspberry Pi)
+# Requires: rustup target add aarch64-unknown-linux-gnu
+# Requires: sudo apt install gcc-aarch64-linux-gnu
+
+[target.x86_64-pc-windows-gnu]
+# For cross-compiling to Windows from Linux
+# Requires: rustup target add x86_64-pc-windows-gnu
+# Requires: sudo apt install mingw-w64
+
+[target.wasm32-unknown-unknown]
+# For building the web target
+# Requires: rustup target add wasm32-unknown-unknown
