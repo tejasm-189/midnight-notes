@@ -13,8 +13,8 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 | `markdown.rs` | ✅ done | Markdown renderer (pulldown-cmark), plain text extractor, link parser |
 | `search.rs` | ✅ done | FTS5 search with tag:/has:todo/path: filters + smart views |
 | `backlinks.rs` | ✅ done | [[Note]] backlink extraction, resolution, linked mentions |
-| `history.rs` | 📋 planned | Version snapshots + diff |
-| `export.rs` | 📋 planned | Encrypted export logic |
+| `history.rs` | ✅ done | Version snapshots: list, get, restore, diff between versions |
+| `export.rs` | ✅ done | Encrypted zip export/import with XChaCha20-Poly1305 |
 
 ## Progress
 - [x] Note CRUD (create, read, update, delete, trash, toggle_pin, toggle_archive)
@@ -24,8 +24,8 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 - [x] [[Wiki-link]] backlink extraction + resolution
 - [x] Linked mentions + outgoing links
 - [x] Smart views (saved FTS5 queries)
-- [ ] Version history
-- [ ] Encrypted exports
+- [x] Version history (list, get, restore, diff)
+- [x] Encrypted zip export/import with salt in metadata
 - [x] Unit tests (33 tests)
 
 ## Notes
