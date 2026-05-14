@@ -55,6 +55,7 @@ hex = "0.4"
 base64 = "0.22"
 zip = "2"
 diff = "0.1"
+dirs = "6"
 
 [profile.release]
 opt-level = 3

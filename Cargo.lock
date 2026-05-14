@@ -3770,6 +3770,7 @@ dependencies = [
  "diff",
  "dioxus",
  "dioxus-desktop",
+ "dirs",
  "hex",
  "notify 7.0.0",
  "notify-debouncer-mini",

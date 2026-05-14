@@ -16,6 +16,12 @@ pub struct Database {
     conn: Mutex<rusqlite::Connection>,
 }
 
+impl PartialEq for Database {
+    fn eq(&self, other: &Self) -> bool {
+        std::ptr::eq(self, other)
+    }
+}
+
 impl Database {
     /// Open or create a SQLite database at the given path.
     /// Note content is encrypted at the application layer via `crypto::cipher`.
