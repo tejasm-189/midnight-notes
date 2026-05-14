@@ -202,7 +202,7 @@ cargo tauri build
 |-------|-------|--------|
 | 1 | Project scaffold, SQLite schema, note CRUD, encryption utilities | ✅ Done |
 | 2 | Dioxus UI shell (vault lock + workspace), screen routing | ✅ Done |
-| 3 | Tags (nested), backlinks (`[[...]]`), smart views, FTS5 search | 📋 Planned |
+| 3 | Tags (nested), backlinks (`[[...]]`), smart views, FTS5 search | ✅ Done |
 | 4 | Multi-mode editor (prose/code/vim), slash commands, KaTeX math | 📋 Planned |
 | 5 | Version history + diff, encrypted exports, attachment blobs | 📋 Planned |
 | 6 | WASM plugin system, file watching (notify), biometric lock | 📋 Planned |

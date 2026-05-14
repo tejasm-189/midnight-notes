@@ -3496,6 +3496,7 @@ dependencies = [
  "notify 7.0.0",
  "notify-debouncer-mini",
  "pulldown-cmark",
+ "regex",
  "rusqlite",
  "serde",
  "serde_json",
