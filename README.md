@@ -205,7 +205,7 @@ cargo tauri build
 | 3 | Tags (nested), backlinks (`[[...]]`), smart views, FTS5 search | ✅ Done |
 | 4 | Multi-mode editor (prose/code/vim), slash commands, KaTeX math | ✅ Done |
 | 5 | Version history + diff, encrypted exports, attachment blobs | ✅ Done |
-| 6 | WASM plugin system, file watching (notify), biometric lock | 📋 Planned |
+| 6 | WASM plugin system, file watching (notify), biometric lock | ✅ Done |
 | 7 | Theming (light/dark/midnight), pinning, archiving, polish | 📋 Planned |
 | 8 | Cross-platform testing, performance optimization, release | 📋 Planned |
 

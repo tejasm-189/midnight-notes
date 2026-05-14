@@ -15,6 +15,13 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 | `backlinks.rs` | ✅ done | [[Note]] backlink extraction, resolution, linked mentions |
 | `history.rs` | ✅ done | Version snapshots: list, get, restore, diff between versions |
 | `export.rs` | ✅ done | Encrypted zip export/import with XChaCha20-Poly1305 |
+| `watcher.rs` | ✅ done | File system watcher via notify (create/modify/delete events) |
+
+## Sub-folders
+
+| Folder | Status | Description |
+|--------|--------|-------------|
+| `plugin/` | ✅ done | WASM plugin host (wasmtime), manager, API types |
 
 ## Progress
 - [x] Note CRUD (create, read, update, delete, trash, toggle_pin, toggle_archive)
@@ -26,7 +33,8 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 - [x] Smart views (saved FTS5 queries)
 - [x] Version history (list, get, restore, diff)
 - [x] Encrypted zip export/import with salt in metadata
-- [x] Unit tests (33 tests)
+- [x] WASM plugin host + manager + file watcher
+- [x] Unit tests (97 tests)
 
 ## Notes
 - Must not import Dioxus or Tauri types
