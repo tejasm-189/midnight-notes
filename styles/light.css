@@ -1,0 +1,7 @@
+/* Light theme variables */
+:root {
+  --color-surface: #fefefe;
+  --color-on-surface: #1c1b1b;
+  --color-primary: #006970;
+  /* TODO: full light theme palette */
+}

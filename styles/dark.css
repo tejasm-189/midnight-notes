@@ -1,0 +1,7 @@
+/* Dark theme variables */
+:root {
+  --color-surface: #131313;
+  --color-on-surface: #e5e2e1;
+  --color-primary: #00dbe9;
+  /* TODO: full dark theme palette */
+}

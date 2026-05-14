@@ -1,0 +1,69 @@
+[package]
+name = "midnight-notes"
+version = "0.1.0"
+edition = "2021"
+description = "A cross-platform, encrypted notes application with Dioxus + Tauri"
+
+[dependencies]
+# Tauri
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-shell = "2"
+
+# Dioxus
+dioxus = { version = "0.6", features = ["desktop", "web"] }
+dioxus-desktop = "0.6"
+
+# Storage (SQLCipher bundled for encrypted SQLite)
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# Encryption
+argon2 = "0.5"
+chacha20poly1305 = "0.10"
+aes-gcm = "0.10"
+
+# Markdown
+pulldown-cmark = "0.12"
+
+# Syntax highlighting
+syntect = { version = "5", default-features = false, features = ["default-onig"] }
+
+# Search
+tantivy = "0.22"
+
+# File watching
+notify = "7"
+notify-debouncer-mini = "0.4"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# Utilities
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+hex = "0.4"
+base64 = "0.22"
+zip = "2"
+diff = "0.1"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lib]
+name = "midnight_notes"
+path = "src/lib.rs"
+
+[[bin]]
+name = "midnight-notes"
+path = "src/main.rs"
+
+[features]
+default = ["desktop"]
+desktop = ["dioxus/desktop"]
+web = ["dioxus/web"]

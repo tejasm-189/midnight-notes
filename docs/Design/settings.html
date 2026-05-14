@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - Midnight Notes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-secondary-fixed-variant": "#005226",
+                            "primary-fixed-dim": "#00dbe9",
+                            "on-surface": "#e5e2e1",
+                            "surface": "#131313",
+                            "secondary": "#7dffa2",
+                            "on-primary-fixed-variant": "#004f54",
+                            "inverse-surface": "#e5e2e1",
+                            "surface-container": "#201f1f",
+                            "inverse-primary": "#006970",
+                            "primary-container": "#00f0ff",
+                            "surface-container-low": "#1c1b1b",
+                            "on-error": "#690005",
+                            "on-tertiary-container": "#715d00",
+                            "surface-variant": "#353534",
+                            "secondary-fixed": "#62ff96",
+                            "on-surface-variant": "#b9cacb",
+                            "outline-variant": "#3b494b",
+                            "outline": "#849495",
+                            "on-secondary-fixed": "#00210b",
+                            "on-primary-fixed": "#002022",
+                            "inverse-on-surface": "#313030",
+                            "surface-container-lowest": "#0e0e0e",
+                            "surface-dim": "#131313",
+                            "on-secondary-container": "#00622e",
+                            "tertiary": "#fff5de",
+                            "primary-fixed": "#7df4ff",
+                            "on-background": "#e5e2e1",
+                            "error-container": "#93000a",
+                            "on-secondary": "#003918",
+                            "secondary-container": "#05e777",
+                            "background": "#131313",
+                            "on-primary-container": "#006970",
+                            "tertiary-fixed-dim": "#eac324",
+                            "surface-bright": "#393939",
+                            "primary": "#dbfcff",
+                            "on-tertiary": "#3b2f00",
+                            "surface-tint": "#00dbe9",
+                            "tertiary-container": "#fed639",
+                            "on-primary": "#00363a",
+                            "surface-container-highest": "#353534",
+                            "on-tertiary-fixed-variant": "#554500",
+                            "surface-container-high": "#2a2a2a",
+                            "on-tertiary-fixed": "#231b00",
+                            "tertiary-fixed": "#ffe179",
+                            "error": "#ffb4ab",
+                            "on-error-container": "#ffdad6",
+                            "secondary-fixed-dim": "#00e475"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem"
+                    },
+                    "spacing": {
+                            "unit": "4px",
+                            "gutter": "16px",
+                            "xs": "4px",
+                            "margin-mobile": "16px",
+                            "margin-desktop": "32px",
+                            "xl": "40px",
+                            "sm": "8px",
+                            "md": "16px",
+                            "lg": "24px"
+                    },
+                    "fontFamily": {
+                            "label-mono": [
+                                    "JetBrains Mono"
+                            ],
+                            "headline-lg-mobile": [
+                                    "Inter"
+                            ],
+                            "code-block": [
+                                    "JetBrains Mono"
+                            ],
+                            "headline-md": [
+                                    "Inter"
+                            ],
+                            "body-md": [
+                                    "Inter"
+                            ],
+                            "display": [
+                                    "Inter"
+                            ],
+                            "headline-lg": [
+                                    "Inter"
+                            ],
+                            "body-lg": [
+                                    "Inter"
+                            ]
+                    },
+                    "fontSize": {
+                            "label-mono": [
+                                    "12px",
+                                    {
+                                            "lineHeight": "16px",
+                                            "letterSpacing": "0.05em",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "headline-lg-mobile": [
+                                    "20px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "code-block": [
+                                    "14px",
+                                    {
+                                            "lineHeight": "22px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "headline-md": [
+                                    "20px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "body-md": [
+                                    "14px",
+                                    {
+                                            "lineHeight": "20px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "display": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "letterSpacing": "-0.02em",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "headline-lg": [
+                                    "24px",
+                                    {
+                                            "lineHeight": "32px",
+                                            "letterSpacing": "-0.01em",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "body-lg": [
+                                    "16px",
+                                    {
+                                            "lineHeight": "24px",
+                                            "fontWeight": "400"
+                                    }
+                            ]
+                    }
+            },
+                },
+            }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex selection:bg-primary-fixed-dim selection:text-on-primary">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col w-64 h-screen sticky left-0 py-md bg-surface border-r border-outline-variant z-40">
+<div class="px-md mb-xl flex items-center gap-sm">
+<span aria-hidden="true" class="material-symbols-outlined text-primary-fixed-dim font-display text-display" style="font-variation-settings: 'FILL' 1;">lock</span>
+<div>
+<h1 class="font-display text-headline-md text-primary-fixed-dim">Midnight Notes</h1>
+<p class="font-label-mono text-label-mono text-on-surface-variant">Local-first Sync</p>
+</div>
+</div>
+<button class="mx-md mb-lg flex items-center justify-center gap-sm py-sm px-md rounded bg-primary-fixed-dim text-on-primary font-label-mono text-label-mono hover:brightness-110 transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+            New Note
+        </button>
+<ul class="flex-1 space-y-xs px-sm">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">description</span>
+                    All Notes
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">auto_awesome</span>
+                    Smart Views
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">archive</span>
+                    Archived
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                    Trash
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono bg-surface-container-high text-primary-fixed-dim border-l-2 border-primary-fixed-dim focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">settings</span>
+                    Settings
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">lock</span>
+                    Encrypted
+                </a>
+</li>
+</ul>
+<div class="mt-auto px-sm border-t border-outline-variant pt-md">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">help</span>
+                        Help
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded font-label-mono text-label-mono text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">sensors</span>
+                        Status
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-h-screen relative w-full overflow-hidden">
+<!-- TopAppBar (Mobile & Contextual) -->
+<header class="md:hidden sticky top-0 w-full flex items-center justify-between px-md h-16 w-full max-w-full bg-surface-container-lowest border-b border-outline-variant z-30">
+<button class="text-primary-fixed-dim hover:bg-surface-container-high transition-colors p-xs rounded focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined text-[24px]">menu_open</span>
+</button>
+<h2 class="font-headline-md text-headline-md text-on-surface">Settings</h2>
+<div class="flex gap-sm">
+<!-- Trailing actions suppressed for settings focus, or minimal if needed -->
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-lg pb-xl max-w-[840px] mx-auto w-full">
+<div class="mb-xl md:mb-[64px] hidden md:block">
+<h2 class="font-display text-display text-on-surface tracking-tight">Settings &amp; Security</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Manage your encryption keys, appearance, and sync preferences.</p>
+</div>
+<div class="space-y-xl md:space-y-[64px]">
+<!-- Encryption Section -->
+<section>
+<div class="mb-md border-b border-outline-variant pb-xs flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-size: 20px;">security</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Encryption</h3>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg overflow-hidden">
+<!-- Setting Item -->
+<div class="p-md border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-md hover:bg-[#1E1E1E] transition-colors">
+<div>
+<h4 class="font-body-lg text-body-lg text-on-surface">Key Management</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">View and cycle your active encryption keys.</p>
+</div>
+<button class="shrink-0 font-label-mono text-label-mono px-md py-sm border border-outline-variant text-on-surface rounded hover:border-primary-fixed-dim focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">key</span>
+                                Manage Keys
+                            </button>
+</div>
+<!-- Setting Item -->
+<div class="p-md flex flex-col sm:flex-row sm:items-center justify-between gap-md hover:bg-[#1E1E1E] transition-colors">
+<div>
+<h4 class="font-body-lg text-body-lg text-on-surface">Argon2id Parameters</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Adjust KDF memory and iteration costs. (Advanced)</p>
+</div>
+<div class="font-label-mono text-label-mono text-on-surface-variant flex items-center gap-xs">
+<span>m=65536, t=3, p=4</span>
+<button class="p-xs text-primary-fixed-dim hover:bg-surface-container-low rounded">
+<span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Appearance Section -->
+<section>
+<div class="mb-md border-b border-outline-variant pb-xs flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-size: 20px;">palette</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Appearance</h3>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg overflow-hidden p-md">
+<div class="mb-md">
+<h4 class="font-body-lg text-body-lg text-on-surface">Theme Switcher</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Select your preferred visual environment.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-md">
+<!-- Theme Option 1 -->
+<label class="cursor-pointer group relative">
+<input class="peer sr-only" name="theme" type="radio" value="light"/>
+<div class="border border-outline-variant rounded p-sm flex flex-col items-center gap-sm bg-surface-container-lowest peer-checked:border-primary-fixed-dim peer-checked:ring-1 peer-checked:ring-primary-fixed-dim transition-all group-hover:border-outline">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 24px;">light_mode</span>
+<span class="font-label-mono text-label-mono text-on-surface-variant peer-checked:text-primary-fixed-dim">Light</span>
+</div>
+</label>
+<!-- Theme Option 2 -->
+<label class="cursor-pointer group relative">
+<input class="peer sr-only" name="theme" type="radio" value="dark"/>
+<div class="border border-outline-variant rounded p-sm flex flex-col items-center gap-sm bg-surface-container-low peer-checked:border-primary-fixed-dim peer-checked:ring-1 peer-checked:ring-primary-fixed-dim transition-all group-hover:border-outline">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 24px;">dark_mode</span>
+<span class="font-label-mono text-label-mono text-on-surface-variant peer-checked:text-primary-fixed-dim">Dark</span>
+</div>
+</label>
+<!-- Theme Option 3 (Active) -->
+<label class="cursor-pointer group relative">
+<input checked="" class="peer sr-only" name="theme" type="radio" value="midnight"/>
+<div class="border border-primary-fixed-dim ring-1 ring-primary-fixed-dim rounded p-sm flex flex-col items-center gap-sm bg-surface transition-all">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-size: 24px;">nightlight</span>
+<span class="font-label-mono text-label-mono text-primary-fixed-dim">Midnight</span>
+</div>
+</label>
+</div>
+</div>
+</section>
+<!-- Sync & Backup Section -->
+<section>
+<div class="mb-md border-b border-outline-variant pb-xs flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-size: 20px;">sync</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Sync &amp; Backup</h3>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg overflow-hidden">
+<!-- Setting Item -->
+<div class="p-md border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-md hover:bg-[#1E1E1E] transition-colors">
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface">Local Directory</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Choose where your encrypted vault is stored locally.</p>
+<div class="mt-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 16px;">folder</span>
+<code class="font-code-block text-code-block text-on-surface-variant bg-surface-container-low px-xs py-[2px] rounded">~/Documents/MidnightVault</code>
+</div>
+</div>
+<button class="shrink-0 font-label-mono text-label-mono px-md py-sm border border-outline-variant text-on-surface rounded hover:border-primary-fixed-dim focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim transition-all">
+                                Change
+                            </button>
+</div>
+<!-- Setting Item -->
+<div class="p-md flex flex-col sm:flex-row sm:items-center justify-between gap-md hover:bg-[#1E1E1E] transition-colors">
+<div>
+<h4 class="font-body-lg text-body-lg text-on-surface">Manual Backup</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Create a portable, encrypted archive of your entire vault.</p>
+</div>
+<button class="shrink-0 font-label-mono text-label-mono px-md py-sm bg-primary-fixed-dim text-on-primary rounded hover:brightness-110 focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">download</span>
+                                Encrypted Export
+                            </button>
+</div>
+</div>
+</section>
+<!-- Biometrics Section -->
+<section>
+<div class="mb-md border-b border-outline-variant pb-xs flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-size: 20px;">fingerprint</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Biometrics</h3>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg overflow-hidden p-md hover:bg-[#1E1E1E] transition-colors flex items-center justify-between gap-md">
+<div>
+<h4 class="font-body-lg text-body-lg text-on-surface">Hardware Authentication</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Enable Windows Hello or Touch ID for quick unlock.</p>
+</div>
+<!-- Toggle -->
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant rounded-full peer peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-primary-fixed-dim peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-fixed-dim border border-outline-variant"></div>
+</label>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full md:w-[calc(100%-16rem)] md:left-64 flex justify-between items-center px-md py-xs h-8 bg-surface-container-lowest border-t border-outline-variant z-20">
+<div class="font-label-mono text-label-mono font-bold text-primary-fixed-dim flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary" style="font-size: 14px; font-variation-settings: 'FILL' 1;">lock</span>
+                End-to-End Encrypted
+            </div>
+<div class="flex gap-md font-label-mono text-label-mono text-on-surface-variant hidden sm:flex">
+<span class="hover:text-primary-fixed-dim transition-colors cursor-default">Word Count: 452</span>
+<span class="hover:text-primary-fixed-dim transition-colors cursor-default">Read Time: 3m</span>
+<span class="hover:text-primary-fixed-dim transition-colors cursor-default">VIM Mode: Enabled</span>
+</div>
+</footer>
+</div>
+</body></html>

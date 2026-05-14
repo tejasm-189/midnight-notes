@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Midnight Notes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#005226",
+                        "primary-fixed-dim": "#00dbe9",
+                        "on-surface": "#e5e2e1",
+                        "surface": "#131313",
+                        "secondary": "#7dffa2",
+                        "on-primary-fixed-variant": "#004f54",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "inverse-primary": "#006970",
+                        "primary-container": "#00f0ff",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#715d00",
+                        "surface-variant": "#353534",
+                        "secondary-fixed": "#62ff96",
+                        "on-surface-variant": "#b9cacb",
+                        "outline-variant": "#3b494b",
+                        "outline": "#849495",
+                        "on-secondary-fixed": "#00210b",
+                        "on-primary-fixed": "#002022",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-dim": "#131313",
+                        "on-secondary-container": "#00622e",
+                        "tertiary": "#fff5de",
+                        "primary-fixed": "#7df4ff",
+                        "on-background": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-secondary": "#003918",
+                        "secondary-container": "#05e777",
+                        "background": "#131313",
+                        "on-primary-container": "#006970",
+                        "tertiary-fixed-dim": "#eac324",
+                        "surface-bright": "#393939",
+                        "primary": "#dbfcff",
+                        "on-tertiary": "#3b2f00",
+                        "surface-tint": "#00dbe9",
+                        "tertiary-container": "#fed639",
+                        "on-primary": "#00363a",
+                        "surface-container-highest": "#353534",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-fixed": "#231b00",
+                        "tertiary-fixed": "#ffe179",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#00e475"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px"
+                    },
+                    fontFamily: {
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Inter"],
+                        "code-block": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "label-mono": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "headline-lg-mobile": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "code-block": ["14px", { lineHeight: "22px", fontWeight: "400" }],
+                        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "display": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "headline-lg": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b494b; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex h-screen overflow-hidden antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar -->
+<nav class="bg-surface dark:bg-surface font-label-mono text-label-mono h-screen sticky left-0 border-r border-outline-variant flat no shadows flex flex-col w-64 h-full py-md shrink-0 hidden md:flex z-10">
+<div class="px-md mb-lg">
+<h1 class="font-display text-headline-md text-primary-fixed-dim">Midnight Notes</h1>
+<p class="text-secondary-fixed-dim">Local-first Sync</p>
+</div>
+<div class="px-md mb-md">
+<button class="w-full flex items-center justify-center gap-2 bg-primary-fixed-dim text-on-primary-fixed py-sm px-md rounded hover:bg-primary transition-colors focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                New Note
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto mt-sm">
+<ul class="flex flex-col">
+<li class="bg-surface-container-high text-primary-fixed-dim border-l-2 border-primary-fixed-dim flex items-center gap-3 px-md py-sm cursor-pointer hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" style="font-size: 18px;">description</span>
+<span>All Notes</span>
+</li>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
+<span>Smart Views</span>
+</li>
+<!-- Tags/Folders (Not in JSON, but requested in prompt) -->
+<li class="mt-md mb-xs px-md text-on-surface-variant opacity-70">TAGS</li>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">tag</span>
+<span>work/projects</span>
+</li>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">tag</span>
+<span>personal/ideas</span>
+</li>
+<li class="mt-md text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">archive</span>
+<span>Archived</span>
+</li>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+<span>Trash</span>
+</li>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">lock</span>
+<span>Encrypted</span>
+</li>
+</ul>
+</div>
+<div class="mt-auto border-t border-outline-variant pt-sm">
+<ul>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
+<span>Settings</span>
+</li>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">help</span>
+<span>Help</span>
+</li>
+<li class="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-md py-sm border-l-2 border-transparent cursor-pointer hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">sensors</span>
+<span>Status</span>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Workspace Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-background relative">
+<!-- TopAppBar (Mobile view handler mostly, but integrated for editor header on desktop) -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest sticky top-0 w-full border-b border-outline-variant flat no shadows flex items-center justify-between px-md h-16 w-full max-w-full z-20 shrink-0 md:hidden">
+<button class="text-primary-fixed-dim dark:text-primary-fixed-dim hover:bg-surface-container-high transition-colors p-sm rounded focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="menu_open">menu_open</span>
+</button>
+<div class="font-display text-display text-primary-fixed-dim font-headline-md text-headline-md dark:text-on-surface">Editor</div>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors p-sm rounded"><span class="material-symbols-outlined" data-icon="push_pin">push_pin</span></button>
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors p-sm rounded"><span class="material-symbols-outlined" data-icon="security">security</span></button>
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors p-sm rounded"><span class="material-symbols-outlined" data-icon="more_vert">more_vert</span></button>
+</div>
+</header>
+<!-- Two Pane Content Area (Note List + Editor) -->
+<div class="flex-1 flex overflow-hidden h-full">
+<!-- Pane 2: Note List -->
+<aside class="w-80 border-r border-outline-variant bg-surface-container-lowest flex flex-col shrink-0 hidden lg:flex">
+<div class="p-md border-b border-outline-variant">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface border border-outline-variant rounded py-1 pl-8 pr-3 text-body-md text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary-fixed-dim focus:ring-1 focus:ring-primary-fixed-dim transition-colors h-8" placeholder="Search notes..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- Note Item Active -->
+<div class="p-md border-b border-outline-variant bg-surface-container-high cursor-pointer relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-fixed-dim"></div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-body-md text-primary-fixed-dim truncate">API Endpoint Refactoring</h3>
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm" data-weight="fill">push_pin</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2 text-sm">Need to update the v2 endpoints to handle the new authentication token format before the weekend deployment.</p>
+<div class="flex justify-between items-center mt-2">
+<span class="font-label-mono text-label-mono text-on-surface-variant text-xs">Today, 10:42 AM</span>
+<div class="flex gap-1">
+<span class="bg-surface px-1.5 py-0.5 rounded border border-outline-variant font-label-mono text-[10px] text-on-surface-variant">#work</span>
+</div>
+</div>
+</div>
+<!-- Note Item Inactive -->
+<div class="p-md border-b border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-body-md text-on-surface truncate">Weekly Sync Notes</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2 text-sm">Discussed the upcoming roadmap for Q3. Main focus will be reducing technical debt in the frontend monolithic app.</p>
+<div class="flex justify-between items-center mt-2">
+<span class="font-label-mono text-label-mono text-on-surface-variant text-xs">Yesterday</span>
+<div class="flex gap-1">
+<span class="bg-surface px-1.5 py-0.5 rounded border border-outline-variant font-label-mono text-[10px] text-on-surface-variant">#meetings</span>
+</div>
+</div>
+</div>
+<!-- Note Item Inactive -->
+<div class="p-md border-b border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-body-md text-on-surface truncate">Docker Config Snippets</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2 text-sm">docker-compose.yml setup for the local redis and postgres instances. Make sure to bind the correct ports.</p>
+<div class="flex justify-between items-center mt-2">
+<span class="font-label-mono text-label-mono text-on-surface-variant text-xs">Oct 12</span>
+<div class="flex gap-1">
+<span class="bg-surface px-1.5 py-0.5 rounded border border-outline-variant font-label-mono text-[10px] text-on-surface-variant">#devops</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Pane 3: Editor -->
+<section class="flex-1 flex flex-col bg-background relative min-w-0">
+<!-- Desktop Editor Header -->
+<header class="bg-surface-container-lowest border-b border-outline-variant h-16 flex items-center justify-between px-md hidden md:flex shrink-0">
+<div class="flex items-center gap-md">
+<!-- Mode Switcher -->
+<div class="flex bg-surface rounded border border-outline-variant p-0.5 font-label-mono text-label-mono">
+<button class="px-sm py-1 rounded bg-surface-container-high text-primary-fixed-dim shadow-sm">Prose</button>
+<button class="px-sm py-1 rounded text-on-surface-variant hover:text-on-surface transition-colors">Code</button>
+<button class="px-sm py-1 rounded text-on-surface-variant hover:text-on-surface transition-colors">Vim</button>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="flex items-center gap-1 font-label-mono text-label-mono text-secondary mr-md bg-surface-container-high px-2 py-1 rounded border border-outline-variant">
+<span class="material-symbols-outlined text-[14px]">lock</span> Encrypted
+                        </span>
+<button class="text-primary-fixed-dim hover:bg-surface-container-high transition-colors p-sm rounded flex items-center justify-center border border-transparent focus:border-primary-fixed-dim outline-none">
+<span class="material-symbols-outlined" data-weight="fill">push_pin</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors p-sm rounded flex items-center justify-center border border-transparent focus:border-primary-fixed-dim outline-none">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<button class="bg-primary-fixed-dim text-on-primary-fixed font-label-mono text-label-mono px-3 py-1.5 rounded hover:bg-primary transition-colors ml-sm">
+                            Save
+                        </button>
+</div>
+</header>
+<!-- Main Editor Area (Canvas) -->
+<div class="flex-1 overflow-y-auto w-full flex justify-center pb-xl">
+<div class="w-full max-w-[840px] px-margin-mobile md:px-margin-desktop py-lg relative">
+<!-- Line numbers gutter for the 'technical' feel -->
+<div class="absolute left-0 top-0 bottom-0 w-8 border-r border-outline-variant hidden sm:flex flex-col items-end py-lg pr-2 font-code-block text-code-block text-outline-variant opacity-30 select-none">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+</div>
+<!-- Editor Content -->
+<div class="sm:pl-gutter w-full">
+<input class="w-full bg-transparent border-none font-display text-display text-on-surface placeholder-on-surface-variant mb-md focus:outline-none focus:ring-0 p-0" type="text" value="API Endpoint Refactoring"/>
+<div class="font-body-lg text-body-lg text-on-surface space-y-md">
+<p class="leading-relaxed">Need to update the v2 endpoints to handle the new authentication token format before the weekend deployment. The old JWT structure is missing the scopes array which is causing authorization failures on the staging environment.</p>
+<h3 class="font-headline-lg text-headline-lg mt-lg mb-sm text-on-surface">Tasks</h3>
+<ul class="space-y-sm">
+<li class="flex items-start gap-sm">
+<div class="mt-1 flex-shrink-0 w-4 h-4 rounded border border-primary-fixed-dim bg-primary-fixed-dim flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed text-[12px]" data-weight="fill">check</span>
+</div>
+<span class="line-through text-on-surface-variant">Update middleware validation logic</span>
+</li>
+<li class="flex items-start gap-sm">
+<div class="mt-1 flex-shrink-0 w-4 h-4 rounded border border-outline-variant bg-transparent"></div>
+<span>Modify `AuthService.ts` to decode new payload</span>
+</li>
+<li class="flex items-start gap-sm">
+<div class="mt-1 flex-shrink-0 w-4 h-4 rounded border border-outline-variant bg-transparent"></div>
+<span>Write unit tests for scope checking</span>
+</li>
+</ul>
+<h3 class="font-headline-lg text-headline-lg mt-lg mb-sm text-on-surface">Code Reference</h3>
+<p class="text-on-surface-variant">The current payload looks like this in the decoder:</p>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-md overflow-hidden my-sm">
+<div class="bg-surface-container-high px-sm py-1 border-b border-outline-variant flex items-center justify-between">
+<span class="font-label-mono text-label-mono text-on-surface-variant">typescript</span>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">content_copy</span></button>
+</div>
+<div class="p-md font-code-block text-code-block overflow-x-auto bg-[#0a0a0a]">
+<pre><code class="text-[#e5e2e1]"><span class="text-[#7dffa2]">interface</span> JWTPayload {
+  <span class="text-[#00dbe9]">sub</span>: string;
+  <span class="text-[#00dbe9]">exp</span>: number;
+  <span class="text-[#3b494b]">/* Need to add this block */</span>
+  <span class="text-[#ffe179]">scopes</span>: string[];
+  <span class="text-[#ffe179]">roles</span>: string[];
+}</code></pre>
+</div>
+</div>
+<p>Once updated, ensure to run the test suite specifically for the auth module.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest fixed bottom-0 w-full border-t border-outline-variant flat no shadows flex justify-between items-center px-md py-xs h-8 w-full z-30 shrink-0 cursor-default lg:pl-[20rem]">
+<div class="font-label-mono text-label-mono font-bold text-primary-fixed-dim">
+                End-to-End Encrypted
+            </div>
+<div class="flex gap-md font-label-mono text-label-mono text-on-surface-variant">
+<span class="hover:text-primary-fixed-dim transition-colors">Word Count: 452</span>
+<span class="hover:text-primary-fixed-dim transition-colors">Read Time: 3m</span>
+<span class="text-primary-fixed-dim">VIM Mode: Enabled</span>
+</div>
+</footer>
+</main>
+</body></html>

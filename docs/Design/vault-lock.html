@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Midnight Notes - Secure Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#005226",
+                      "primary-fixed-dim": "#00dbe9",
+                      "on-surface": "#e5e2e1",
+                      "surface": "#131313",
+                      "secondary": "#7dffa2",
+                      "on-primary-fixed-variant": "#004f54",
+                      "inverse-surface": "#e5e2e1",
+                      "surface-container": "#201f1f",
+                      "inverse-primary": "#006970",
+                      "primary-container": "#00f0ff",
+                      "surface-container-low": "#1c1b1b",
+                      "on-error": "#690005",
+                      "on-tertiary-container": "#715d00",
+                      "surface-variant": "#353534",
+                      "secondary-fixed": "#62ff96",
+                      "on-surface-variant": "#b9cacb",
+                      "outline-variant": "#3b494b",
+                      "outline": "#849495",
+                      "on-secondary-fixed": "#00210b",
+                      "on-primary-fixed": "#002022",
+                      "inverse-on-surface": "#313030",
+                      "surface-container-lowest": "#0e0e0e",
+                      "surface-dim": "#131313",
+                      "on-secondary-container": "#00622e",
+                      "tertiary": "#fff5de",
+                      "primary-fixed": "#7df4ff",
+                      "on-background": "#e5e2e1",
+                      "error-container": "#93000a",
+                      "on-secondary": "#003918",
+                      "secondary-container": "#05e777",
+                      "background": "#131313",
+                      "on-primary-container": "#006970",
+                      "tertiary-fixed-dim": "#eac324",
+                      "surface-bright": "#393939",
+                      "primary": "#dbfcff",
+                      "on-tertiary": "#3b2f00",
+                      "surface-tint": "#00dbe9",
+                      "tertiary-container": "#fed639",
+                      "on-primary": "#00363a",
+                      "surface-container-highest": "#353534",
+                      "on-tertiary-fixed-variant": "#554500",
+                      "surface-container-high": "#2a2a2a",
+                      "on-tertiary-fixed": "#231b00",
+                      "tertiary-fixed": "#ffe179",
+                      "error": "#ffb4ab",
+                      "on-error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#00e475"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "gutter": "16px",
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "32px",
+                      "xl": "40px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "label-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "code-block": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "code-block": [
+                              "14px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface-container-lowest text-on-surface h-screen flex flex-col items-center justify-center overflow-hidden">
+<!-- Suppressed TopAppBar and SideNavBar as this is a transactional/entry screen per Shared Components Logic -->
+<main class="w-full max-w-md px-margin-mobile md:px-margin-desktop flex flex-col items-center z-10">
+<!-- Branding Section -->
+<div class="flex flex-col items-center mb-xl text-center">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[48px] mb-sm" style="font-variation-settings: 'FILL' 1;">
+                lock
+            </span>
+<h1 class="font-display text-display text-primary-fixed-dim tracking-tight">Midnight Notes</h1>
+<p class="font-label-mono text-label-mono text-on-surface-variant mt-xs flex items-center justify-center gap-xs">
+                Local-first Sync <span class="w-1 h-1 bg-secondary-fixed-dim rounded-full inline-block"></span> End-to-End Encrypted
+            </p>
+</div>
+<!-- Authentication Container -->
+<div class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-lg flex flex-col gap-lg shadow-none">
+<!-- Biometric Option (Primary OS Style) -->
+<button class="w-full group relative overflow-hidden bg-primary-fixed-dim text-on-primary-container font-label-mono text-label-mono py-md rounded-lg flex flex-col items-center justify-center gap-sm transition-all focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim hover:brightness-110 active:scale-95 duration-100">
+<span class="material-symbols-outlined text-[32px] group-hover:scale-110 transition-transform duration-300">
+                    fingerprint
+                </span>
+<span>Unlock with Biometrics</span>
+</button>
+<!-- Divider -->
+<div class="flex items-center w-full">
+<div class="flex-grow border-t border-outline-variant"></div>
+<span class="px-md font-label-mono text-label-mono text-on-surface-variant">OR</span>
+<div class="flex-grow border-t border-outline-variant"></div>
+</div>
+<!-- Master Password Form -->
+<form class="flex flex-col gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-mono text-label-mono text-on-surface-variant flex items-center gap-xs" for="master-password">
+<span class="material-symbols-outlined text-[16px]">key</span>
+                        Master Password
+                    </label>
+<input autocomplete="current-password" class="w-full bg-surface text-on-surface font-code-block text-code-block px-sm py-sm border-b border-outline-variant focus:border-primary-fixed-dim focus:outline-none focus:ring-0 transition-colors placeholder-on-surface-variant/50" id="master-password" placeholder="••••••••••••••••" type="password"/>
+</div>
+<button class="w-full bg-transparent border border-outline-variant text-on-surface font-label-mono text-label-mono py-sm rounded flex items-center justify-center gap-sm hover:border-primary-fixed-dim focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim transition-all active:scale-95 duration-100" type="button">
+<span>Unlock Vault</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</form>
+</div>
+<!-- Recovery / Info -->
+<div class="mt-lg text-center">
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary-fixed-dim transition-colors flex items-center justify-center gap-xs" href="#">
+<span class="material-symbols-outlined text-[14px]">help</span>
+                Forgot Master Password?
+            </a>
+<p class="font-label-mono text-[10px] text-outline mt-sm max-w-xs mx-auto leading-relaxed">
+                Vaults are zero-knowledge. We cannot recover your data if you lose your master password or biometric access.
+            </p>
+</div>
+</main>
+<!-- Suppressed Footer as this is a transactional screen -->
+</body></html>

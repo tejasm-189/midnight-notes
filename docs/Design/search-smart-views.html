@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advanced Search &amp; Smart Views - Midnight Notes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#005226",
+                        "primary-fixed-dim": "#00dbe9",
+                        "on-surface": "#e5e2e1",
+                        "surface": "#131313",
+                        "secondary": "#7dffa2",
+                        "on-primary-fixed-variant": "#004f54",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "inverse-primary": "#006970",
+                        "primary-container": "#00f0ff",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#715d00",
+                        "surface-variant": "#353534",
+                        "secondary-fixed": "#62ff96",
+                        "on-surface-variant": "#b9cacb",
+                        "outline-variant": "#3b494b",
+                        "outline": "#849495",
+                        "on-secondary-fixed": "#00210b",
+                        "on-primary-fixed": "#002022",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-dim": "#131313",
+                        "on-secondary-container": "#00622e",
+                        "tertiary": "#fff5de",
+                        "primary-fixed": "#7df4ff",
+                        "on-background": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-secondary": "#003918",
+                        "secondary-container": "#05e777",
+                        "background": "#131313",
+                        "on-primary-container": "#006970",
+                        "tertiary-fixed-dim": "#eac324",
+                        "surface-bright": "#393939",
+                        "primary": "#dbfcff",
+                        "on-tertiary": "#3b2f00",
+                        "surface-tint": "#00dbe9",
+                        "tertiary-container": "#fed639",
+                        "on-primary": "#00363a",
+                        "surface-container-highest": "#353534",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-fixed": "#231b00",
+                        "tertiary-fixed": "#ffe179",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#00e475"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Inter"],
+                        "code-block": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "code-block": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #000000; color: #e5e2e1; }
+        .editor-container { max-width: 840px; }
+        .glow-focus:focus-within { border-color: #00dbe9; box-shadow: 0 0 0 1px #00dbe9; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col w-64 h-screen sticky left-0 border-r border-outline-variant bg-surface dark:bg-surface py-md">
+<div class="px-md mb-xl flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="description">description</span>
+<div>
+<h1 class="font-display text-headline-md text-primary-fixed-dim">Midnight Notes</h1>
+<p class="font-label-mono text-label-mono text-on-surface-variant">Local-first Sync</p>
+</div>
+</div>
+<div class="px-md mb-md">
+<button class="w-full flex items-center justify-center gap-sm bg-primary-fixed-dim text-surface font-label-mono text-label-mono py-sm rounded hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                New Note
+            </button>
+</div>
+<nav class="flex-1 px-sm space-y-xs">
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all font-label-mono text-label-mono focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                All Notes
+            </a>
+<!-- Active State: Smart Views -->
+<a class="flex items-center gap-sm px-sm py-sm rounded bg-surface-container-high text-primary-fixed-dim border-l-2 border-primary-fixed-dim font-label-mono text-label-mono focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome" data-weight="fill" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                Smart Views
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all font-label-mono text-label-mono focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+                Archived
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all font-label-mono text-label-mono focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+                Trash
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all font-label-mono text-label-mono focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all font-label-mono text-label-mono focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim" href="#">
+<span class="material-symbols-outlined text-secondary-fixed-dim" data-icon="lock">lock</span>
+                Encrypted
+            </a>
+</nav>
+<div class="mt-auto px-sm pt-md border-t border-outline-variant space-y-xs">
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all font-label-mono text-label-mono" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                Help
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all font-label-mono text-label-mono" href="#">
+<span class="material-symbols-outlined" data-icon="sensors">sensors</span>
+                Status
+            </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full z-10 bg-surface-container-lowest dark:bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-md h-16 max-w-full">
+<div class="flex items-center gap-md">
+<button class="md:hidden text-primary-fixed-dim hover:bg-surface-container-high transition-colors p-sm rounded focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h2 class="font-headline-md text-headline-md dark:text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-sm" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+                    Smart Views
+                </h2>
+</div>
+<div class="flex items-center gap-sm">
+<button class="text-primary-fixed-dim hover:bg-surface-container-high transition-colors p-sm rounded focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="push_pin">push_pin</span>
+</button>
+<button class="text-primary-fixed-dim hover:bg-surface-container-high transition-colors p-sm rounded focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+</button>
+<button class="text-primary-fixed-dim hover:bg-surface-container-high transition-colors p-sm rounded focus:outline-none focus:ring-1 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Editor/Search Canvas -->
+<div class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-lg flex justify-center pb-24">
+<div class="w-full editor-container space-y-xl">
+<!-- Search Component -->
+<section class="space-y-sm">
+<div class="relative glow-focus rounded border border-outline-variant bg-surface transition-colors flex items-center px-md py-sm">
+<span class="material-symbols-outlined text-on-surface-variant mr-sm" data-icon="search">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-code-block text-code-block placeholder-on-surface-variant" placeholder="FTS5 Query: 'API design' NEAR 'authentication'" type="text" value="tag:architecture NEAR database"/>
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors ml-sm">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+</div>
+<div class="flex gap-sm flex-wrap">
+<span class="inline-flex items-center gap-xs px-xs py-[2px] bg-surface-container text-on-surface-variant font-label-mono text-label-mono border border-outline-variant rounded">
+                            Examples:
+                        </span>
+<button class="inline-flex items-center gap-xs px-sm py-[2px] bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-label-mono text-label-mono border border-outline-variant rounded cursor-pointer">
+                            has:todo
+                        </button>
+<button class="inline-flex items-center gap-xs px-sm py-[2px] bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-label-mono text-label-mono border border-outline-variant rounded cursor-pointer">
+                            "error handling"
+                        </button>
+<button class="inline-flex items-center gap-xs px-sm py-[2px] bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-label-mono text-label-mono border border-outline-variant rounded cursor-pointer">
+                            path:docs/
+                        </button>
+</div>
+</section>
+<!-- Results Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Search Results Column -->
+<div class="md:col-span-2 space-y-md">
+<h3 class="font-label-mono text-label-mono text-primary-fixed-dim uppercase tracking-wider mb-sm">Matches (3)</h3>
+<!-- Result Card 1 -->
+<div class="border border-outline-variant bg-surface rounded p-md hover:border-outline transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<h4 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary-fixed-dim transition-colors">System Architecture Overview</h4>
+<span class="font-label-mono text-label-mono text-on-surface-variant">2d ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-sm">
+                                The <span class="bg-surface-container-high text-primary-fixed-dim px-xs rounded">database</span> layer handles all persistent storage, relying on the central <span class="bg-surface-container-high text-primary-fixed-dim px-xs rounded">architecture</span> constraints defined in the initial RFC.
+                            </p>
+<div class="flex gap-xs">
+<span class="px-xs py-[2px] bg-surface-container-lowest text-on-surface-variant border border-outline-variant font-label-mono text-label-mono rounded">#architecture</span>
+<span class="px-xs py-[2px] bg-surface-container-lowest text-on-surface-variant border border-outline-variant font-label-mono text-label-mono rounded">#draft</span>
+</div>
+</div>
+<!-- Result Card 2 -->
+<div class="border border-outline-variant bg-surface rounded p-md hover:border-outline transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<h4 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary-fixed-dim transition-colors">Migration Notes V2</h4>
+<span class="font-label-mono text-label-mono text-on-surface-variant">5d ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-sm">
+                                When updating the <span class="bg-surface-container-high text-primary-fixed-dim px-xs rounded">database</span> schema, ensure it aligns with the new microservices <span class="bg-surface-container-high text-primary-fixed-dim px-xs rounded">architecture</span> to prevent scaling bottlenecks.
+                            </p>
+<div class="flex gap-xs">
+<span class="px-xs py-[2px] bg-surface-container-lowest text-on-surface-variant border border-outline-variant font-label-mono text-label-mono rounded">#architecture</span>
+<span class="px-xs py-[2px] bg-surface-container-lowest text-on-surface-variant border border-outline-variant font-label-mono text-label-mono rounded">#backend</span>
+</div>
+</div>
+</div>
+<!-- Linked Mentions Sidebar Panel -->
+<div class="space-y-md border border-outline-variant bg-surface-container-lowest rounded p-md">
+<div class="flex items-center gap-sm border-b border-outline-variant pb-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="hub">hub</span>
+<h3 class="font-label-mono text-label-mono text-primary-fixed-dim uppercase tracking-wider">Linked Graph</h3>
+</div>
+<div class="space-y-sm">
+<div class="font-body-md text-body-md text-on-surface-variant mb-xs">Nodes connected to <span class="text-primary-fixed-dim">#architecture</span></div>
+<ul class="space-y-xs font-code-block text-code-block text-on-surface">
+<li class="flex items-center gap-sm p-sm rounded hover:bg-surface-container-high transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="link">link</span>
+<span>[[Data Models]]</span>
+</li>
+<li class="flex items-center gap-sm p-sm rounded hover:bg-surface-container-high transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="link">link</span>
+<span>[[API Endpoints]]</span>
+</li>
+<li class="flex items-center gap-sm p-sm rounded hover:bg-surface-container-high transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="arrow_forward">arrow_forward</span>
+<span class="text-on-surface-variant">Refs: Authentication Spec</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full z-20 bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant flex justify-between items-center px-md py-xs h-8 cursor-default pl-64 md:pl-64">
+<!-- Offset by 64 (256px) on desktop to account for sidebar, assuming layout integration requires it, or full width if overlaid -->
+<div class="flex gap-md">
+<span class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary-fixed-dim transition-colors">Word Count: 0</span>
+<span class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary-fixed-dim transition-colors">Read Time: 0m</span>
+<span class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary-fixed-dim transition-colors">VIM Mode: Disabled</span>
+</div>
+<div class="font-label-mono text-label-mono font-bold text-primary-fixed-dim flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+            End-to-End Encrypted
+        </div>
+</footer>
+</body></html>

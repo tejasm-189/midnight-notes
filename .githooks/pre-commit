@@ -1,0 +1,30 @@
+#!/bin/sh
+set -e
+
+echo "=== Pre-commit Hook ==="
+
+# Get staged files (handle empty case)
+STAGED=$(git diff --cached --name-only 2>/dev/null || true)
+
+# For each staged .rs file, ensure its directory's README.md is also handled
+echo "$STAGED" | grep '\.rs$' 2>/dev/null || true | while IFS= read -r rs_file; do
+    [ -z "$rs_file" ] && continue
+    dir=$(dirname "$rs_file")
+    readme="$dir/README.md"
+
+    if [ ! -f "$readme" ]; then
+        echo "ERROR: $readme missing — every directory with .rs files must have a README.md" >&2
+        exit 1
+    fi
+
+    if ! echo "$STAGED" | grep -qF "$readme"; then
+        echo "WARNING: $readme is not staged" >&2
+        echo "       You modified $rs_file — update $readme to reflect changes." >&2
+    fi
+done
+
+# Run quality checks
+cargo check --quiet || { echo "ERROR: cargo check failed"; exit 1; }
+cargo fmt -- --check --quiet || { echo "ERROR: cargo fmt failed — run 'cargo fmt'"; exit 1; }
+
+echo "=== Pre-commit Passed ==="
