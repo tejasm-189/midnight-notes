@@ -12,10 +12,10 @@ UI components are primarily tested via visual inspection (Dioxus doesn't have a 
 | Screen | What to test |
 |--------|-------------|
 | Vault Lock | Password input, biometric button, unlock flow |
-| Workspace | Note list, editor, save, pin, archive, trash |
+| Workspace | Note list, editor, save, pin, archive, trash, context menu (⋮), tag chip filtering, Prose/Code/Vim modes |
 | Settings | Theme switching (Light/Dark/Midnight) |
 | Smart Views | Search query, results, linked graph |
-| Calendar | Month navigation, date selection, daily note creation |
+| Calendar | Month navigation, date selection, daily note creation, date format |
 
 ## Running
 ```bash

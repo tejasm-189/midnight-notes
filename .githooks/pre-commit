@@ -16,11 +16,13 @@ echo "$RS_FILES" | while IFS= read -r rs_file; do
         testmd="$dir/Test.md"
 
         if [ -f "$readme" ] && ! echo "$STAGED" | grep -qF "$readme"; then
-            echo "WARNING: $readme is not staged — update it." >&2
+            echo "ERROR: $readme is not staged — update it to reflect changes." >&2
+            exit 1
         fi
 
         if [ -f "$testmd" ] && ! echo "$STAGED" | grep -qF "$testmd"; then
-            echo "WARNING: $testmd is not staged — update it if tests changed." >&2
+            echo "ERROR: $testmd is not staged — update it if tests changed." >&2
+            exit 1
         fi
 
         parent=$(dirname "$dir")

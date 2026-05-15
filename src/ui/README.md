@@ -10,7 +10,7 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 | `mod.rs` | ✅ done | Module root, re-exports |
 | `app.rs` | ✅ done | Root component with screen routing (VaultLock / Workspace) |
 | `vault_lock.rs` | ✅ done | Vault unlock screen (biometric + master password) |
-| `workspace.rs` | ✅ done | Main workspace (sidebar, note list, editor with mode switcher) |
+| `workspace.rs` | ✅ done | Main workspace: sidebar, note list with tag chips + context menu, editor with Prose/Code/Vim modes, auto-save, calendar toggle |
 | `viewer.rs` | ✅ done | Read-only note viewer with markdown rendering |
 | `smart_view.rs` | ✅ done | Smart Views screen: FTS5 search, results grid, linked graph |
 | `settings.rs` | ✅ done | Settings panel with theme switcher (Midnight/Dark/Light) |
@@ -26,11 +26,15 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 ## Progress
 - [x] Root component with routing (VaultLock ↔ Workspace ↔ Settings)
 - [x] Vault lock screen with biometric + password
-- [x] Workspace: sidebar, note list, editor, auto-save, tags, history
+- [x] Workspace: sidebar, note list, editor, auto-save, tags, history, context menu
 - [x] Smart Views: FTS5 search, results grid, linked graph panel
 - [x] Settings: theme selector (Midnight/Dark/Light)
 - [x] Theme system: 3 themes, ThemeColors struct for Rust-level theme
 - [x] Calendar sidebar: date picker month grid, daily notes
+- [x] Context menu on note cards (Pin, Archive, Delete via ⋮ button)
+- [x] Clickable tag chips on note cards (click to filter by tag)
+- [x] Date format: `Mon 15 May 2026 01:03 PM`
+- [x] Prose/Code/Vim mode switching in editor header
 - [x] Backlinks panel, tag tree, smart views list in sidebar
 
 ## Notes
