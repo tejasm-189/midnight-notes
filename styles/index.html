@@ -8,29 +8,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #000; color: #e5e2e1; font-family: Inter, sans-serif; }
+    body { font-family: Inter, sans-serif; overflow: hidden; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #131313; }
-    ::-webkit-scrollbar-thumb { background: #353534; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3b494b; }
+    ::-webkit-scrollbar-track { background: var(--bg-surface); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-surface-highest); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border); }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
-    :root {
-      --primary-fixed-dim: #00dbe9;
-      --secondary-fixed-dim: #00e475;
-      --on-surface: #e5e2e1;
-      --on-surface-variant: #b9cacb;
-      --surface: #131313;
-      --surface-container: #201f1f;
-      --surface-container-low: #1c1b1b;
-      --surface-container-lowest: #0e0e0e;
-      --surface-container-high: #2a2a2a;
-      --outline-variant: #3b494b;
-      --outline: #849495;
-      --error: #ffb4ab;
-    }
     input:focus { outline: none; }
-    button:focus-visible { outline: 1px solid var(--primary-fixed-dim); }
+    button:focus-visible { outline: 1px solid var(--accent); }
   </style>
   {interpreter}
 </head>

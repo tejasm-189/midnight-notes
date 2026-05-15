@@ -185,6 +185,63 @@ impl<'a> NoteService<'a> {
         Ok(notes)
     }
 
+    /// List archived notes.
+    pub fn list_archived(&self) -> Result<Vec<Note>, NoteServiceError> {
+        let conn = self.db.conn();
+        let mut stmt = conn.prepare(
+            "SELECT id, title, content, is_pinned, is_archived, is_trashed, encrypted, created_at, updated_at
+             FROM notes WHERE is_archived = 1 AND is_trashed = 0
+             ORDER BY updated_at DESC",
+        )?;
+        let notes = stmt
+            .query_map([], |row| {
+                Ok(Note {
+                    id: row.get(0)?,
+                    title: row.get(1)?,
+                    content: row.get(2)?,
+                    is_pinned: row.get::<_, i32>(3)? != 0,
+                    is_archived: row.get::<_, i32>(4)? != 0,
+                    is_trashed: row.get::<_, i32>(5)? != 0,
+                    encrypted: row.get::<_, i32>(6)? != 0,
+                    created_at: row
+                        .get::<_, String>(7)?
+                        .parse()
+                        .unwrap_or_else(|_| Utc::now()),
+                    updated_at: row
+                        .get::<_, String>(8)?
+                        .parse()
+                        .unwrap_or_else(|_| Utc::now()),
+                })
+            })?
+            .filter_map(|r| r.ok())
+            .collect();
+        Ok(notes)
+    }
+
+    /// Restore a trashed or archived note (clear both flags).
+    pub fn restore(&self, id: &str) -> Result<(), NoteServiceError> {
+        let conn = self.db.conn();
+        let now = Utc::now().to_rfc3339();
+        conn.execute(
+            "UPDATE notes SET is_trashed = 0, is_archived = 0, updated_at = ?1 WHERE id = ?2",
+            params![now, id],
+        )?;
+        Ok(())
+    }
+
+    /// Permanently delete a trashed note.
+    pub fn delete_permanently(&self, id: &str) -> Result<(), NoteServiceError> {
+        let conn = self.db.conn();
+        conn.execute("DELETE FROM note_tags WHERE note_id = ?1", params![id])?;
+        conn.execute(
+            "DELETE FROM backlinks WHERE source_note_id = ?1 OR target_note_id = ?1",
+            params![id],
+        )?;
+        conn.execute("DELETE FROM note_history WHERE note_id = ?1", params![id])?;
+        conn.execute("DELETE FROM notes WHERE id = ?1", params![id])?;
+        Ok(())
+    }
+
     /// List trashed notes.
     pub fn list_trashed(&self) -> Result<Vec<Note>, NoteServiceError> {
         let conn = self.db.conn();

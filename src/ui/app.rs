@@ -15,8 +15,28 @@ pub type SharedDb = Arc<Database>;
 
 #[component]
 pub fn App() -> Element {
+    let mut theme = crate::ui::theme::use_init_theme();
     let mut screen = use_signal(|| Screen::VaultLock);
     let mut db: Signal<Option<SharedDb>> = use_signal(|| None);
+
+    // Load theme from DB when it becomes available
+    use_effect(move || {
+        if let Some(ref db_val) = *db.read() {
+            let conn = db_val.conn();
+            if let Ok(saved) =
+                conn.query_row("SELECT value FROM meta WHERE key = 'theme'", [], |row| {
+                    row.get::<_, String>(0)
+                })
+            {
+                let t = match saved.as_str() {
+                    "dark" => crate::ui::theme::Theme::Dark,
+                    "light" => crate::ui::theme::Theme::Light,
+                    _ => crate::ui::theme::Theme::Midnight,
+                };
+                theme.set(t);
+            }
+        }
+    });
 
     rsx! {
         ThemeProvider {

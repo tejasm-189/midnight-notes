@@ -8,26 +8,6 @@ pub fn Settings(db: Option<SharedDb>, on_close: EventHandler<()>) -> Element {
     let c = use_theme_colors();
     let theme = use_theme_signal();
 
-    let db_for_load = db.clone();
-    let mut theme_signal = theme;
-    use_effect(move || {
-        if let Some(ref db_val) = db_for_load {
-            let conn = db_val.conn();
-            if let Ok(saved) =
-                conn.query_row("SELECT value FROM meta WHERE key = 'theme'", [], |row| {
-                    row.get::<_, String>(0)
-                })
-            {
-                let t = match saved.as_str() {
-                    "dark" => Theme::Dark,
-                    "light" => Theme::Light,
-                    _ => Theme::Midnight,
-                };
-                theme_signal.set(t);
-            }
-        }
-    });
-
     let mut theme_mid = theme;
     let mut theme_dark = theme;
     let mut theme_light = theme;
