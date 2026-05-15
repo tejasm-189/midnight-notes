@@ -8,7 +8,7 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 | File | Status | Description |
 |------|--------|-------------|
 | `mod.rs` | ✅ done | Module root, re-exports |
-| `app.rs` | ✅ done | Root component with screen routing (VaultLock / Workspace) |
+| `app.rs` | ✅ done | Root component with screen routing (VaultLock / Workspace) — Settings now inline in workspace |
 | `vault_lock.rs` | ✅ done | Vault unlock screen (biometric + master password) |
 | `workspace.rs` | ✅ done | Main workspace: sidebar, note list with tag chips + context menu, editor (ProseEditor/CodeEditor/Vim modes), auto-save, calendar toggle |
 | `viewer.rs` | ✅ done | Read-only note viewer with markdown rendering |

@@ -1,6 +1,7 @@
 # Tests — src/
 
 ## Integration Tests
+Settings is now inline in workspace (no longer separate screen).
 The following modules support end-to-end tests that span across multiple layers:
 
 | Module | Test coverage |

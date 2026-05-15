@@ -20,11 +20,7 @@ enum View {
 }
 
 #[component]
-pub fn Workspace(
-    db: Option<SharedDb>,
-    on_lock: EventHandler<()>,
-    on_open_settings: EventHandler<()>,
-) -> Element {
+pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
     let c = use_theme_colors();
     let mut view = use_signal(|| View::AllNotes);
     let mut mode = use_signal(|| "Prose");
@@ -40,6 +36,7 @@ pub fn Workspace(
     let mut tag_input = use_signal(String::new);
     let mut note_tag_cache = use_signal(std::collections::HashMap::<String, Vec<String>>::new);
     let mut show_calendar = use_signal(|| false);
+    let mut show_settings = use_signal(|| false);
     let mut context_note = use_signal(|| None::<String>);
 
     let _tag_version = use_signal(|| 0u32);
@@ -268,13 +265,19 @@ pub fn Workspace(
                     SidebarItem { icon: "file_download", label: "Export", active: false, onclick: move |_| { if let Some(ref d) = db_export { let ids: Vec<String> = notes.read().iter().map(|n| n.id.clone()).collect(); let ids_ref: Vec<&str> = ids.iter().map(|s| s.as_str()).collect(); let path = std::path::Path::new("midnight-export.zip"); let _ = ExportService::new(d).export_notes(&ids_ref, path, "export-pass"); } } }
                     SidebarItem { icon: "file_upload", label: "Import", active: false, onclick: move |_| { let path = std::path::Path::new("midnight-export.zip"); if path.exists() { if let Some(ref d) = db_import { let _ = ExportService::new(d).import_notes(path, "export-pass"); let mut n = notes; n.write().clone_from(&vec![]); refresh_notes(&db_import, &View::AllNotes, &notes, ""); } } } }
                     div { style: "height: 1px; background: {c.border}; margin: 4px 0;" }
-                    SidebarItem { icon: "settings", label: "Settings", active: false, onclick: move |_| on_open_settings.call(()) }
+                    SidebarItem { icon: "settings", label: "Settings", active: *show_settings.read(), onclick: move |_| { let s = *show_settings.read(); show_settings.set(!s); } }
                     SidebarItem { icon: "lock", label: "Lock Vault", active: false, onclick: move |_| on_lock.call(()) }
                 }
             }
 
+            // ====== SETTINGS PANEL ======
+            if *show_settings.read() {
+                crate::ui::settings::Settings {
+                    db: db.clone(),
+                    on_close: move |_| show_settings.set(false),
+                }
             // ====== NOTE LIST ======
-            if view.read().clone() != View::SmartViews {
+            } else if view.read().clone() != View::SmartViews {
                 aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
                     div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
                         div { style: "position: relative;",
@@ -380,7 +383,7 @@ pub fn Workspace(
             }
 
             // ====== EDITOR ======
-            if view.read().clone() != View::SmartViews {
+            if !*show_settings.read() && view.read().clone() != View::SmartViews {
                 section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
                     header { style: "height: 56px; background: {c.bg_canvas}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;",
                         div { style: "display: flex; background: {c.bg_surface}; border-radius: 4px; border: 1px solid {c.border}; padding: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px;",

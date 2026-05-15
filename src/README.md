@@ -1,7 +1,7 @@
 # src/ — Source Code
 
 ## Purpose
-All application source code. Organized by layer: UI (Dioxus components), Core (business logic), Storage (SQLite persistence), and Crypto (encryption utilities).
+All application source code. Settings is now inline in workspace. Organized by layer: UI (Dioxus components), Core (business logic), Storage (SQLite persistence), and Crypto (encryption utilities).
 
 ## Files
 

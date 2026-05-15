@@ -8,7 +8,6 @@ use crate::ui::theme::ThemeProvider;
 pub enum Screen {
     VaultLock,
     Workspace,
-    Settings,
 }
 
 pub type SharedDb = Arc<Database>;
@@ -67,17 +66,10 @@ pub fn App() -> Element {
                 Screen::Workspace => rsx! {
                     crate::ui::workspace::Workspace {
                         db: db.read().clone(),
-                        on_open_settings: move || screen.set(Screen::Settings),
                         on_lock: move || {
                             db.set(None);
                             screen.set(Screen::VaultLock);
                         },
-                    }
-                },
-                Screen::Settings => rsx! {
-                    crate::ui::settings::Settings {
-                        db: db.read().clone(),
-                        on_close: move || screen.set(Screen::Workspace),
                     }
                 },
             }
