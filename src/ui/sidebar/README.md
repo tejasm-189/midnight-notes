@@ -1,16 +1,20 @@
-# src/ui/sidebar/ — Navigation Sidebar
+# src/ui/sidebar/ — Sidebar Components
 
 ## Purpose
-Sidebar components for tag tree, smart views, and backlinks panel.
+Sidebar panels: backlinks, tag tree, calendar, smart views list.
 
 ## Files
 
 | File | Status | Description |
 |------|--------|-------------|
 | `mod.rs` | ✅ done | Module root |
-| `tag_tree.rs` | 📋 planned | Nested tag tree navigation |
-| `smart_views.rs` | 📋 planned | Saved FTS5 search queries as virtual folders |
-| `backlinks.rs` | 📋 planned | Linked mentions panel |
+| `backlinks.rs` | ✅ done | Linked mentions panel for selected note, clickable |
+| `tag_tree.rs` | ✅ done | Nested tag tree, clickable to search by tag |
+| `smart_views.rs` | ✅ done | Saved FTS5 smart views list |
+| `calendar.rs` | ✅ done | Date picker month grid, daily notes, date navigation |
 
 ## Progress
-- [x] Module structure
+- [x] Backlinks panel (linked mentions)
+- [x] Tag tree (nested hierarchy, tag filtering)
+- [x] Smart views list (saved searches)
+- [x] Calendar (month grid, date selection, daily notes)

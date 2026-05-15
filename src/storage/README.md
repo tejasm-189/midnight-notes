@@ -1,26 +1,22 @@
 # src/storage/ — Data Persistence
 
 ## Purpose
-SQLCipher-encrypted SQLite database layer. Handles connections, migrations, and row-to-struct mappings. No business logic.
+SQLite database layer with application-layer XChaCha20-Poly1305 encryption. Handles connections, migrations, and row-to-struct mappings. No business logic.
 
 ## Files
 
 | File | Status | Description |
 |------|--------|-------------|
 | `mod.rs` | ✅ done | Module root, re-exports |
-| `database.rs` | ✅ done | SQLite connection (WAL mode, in-memory support) |
-| `migrations.rs` | ✅ done | Schema migrations (notes, tags, FTS5, triggers) |
-| `models.rs` | ✅ done | Row ↔ struct mappings (Note, Tag, Backlink, etc.) |
-| `attachments.rs` | ✅ done | Blob file management |
+| `database.rs` | ✅ done | SQLite + WAL mode, encryption key storage, in-memory support |
+| `migrations.rs` | ✅ done | Schema (notes, tags, note_tags, backlinks, note_history, FTS5, triggers) |
+| `models.rs` | ✅ done | Row structs (Note, Tag, Backlink, NoteHistory, SearchResult) |
+| `attachments.rs` | ✅ done | Blob file management (.attachments/ directory) |
 
 ## Progress
 - [x] Database connection + WAL mode
-- [x] Schema migrations (v1-v4)
+- [x] Schema (11 migrations: tables, FTS5, triggers, meta)
 - [x] Model mappings
 - [x] Attachment handling
-- [x] Unit tests (6 tests)
-
-## Notes
-- Entire DB file encrypted via SQLCipher (XChaCha20-Poly1305)
-- Key derived from master password via Argon2id (done in `crypto/`)
-- FTS5 for full-text search
+- [x] Encryption key management on Database struct
+- [x] Unit tests
