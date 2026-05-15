@@ -1,37 +1,51 @@
 #!/bin/sh
-set -e
 
-echo "=== Pre-commit Hook ==="
+echo "=== Midnight Notes: Documentation Enforcement ==="
 
-STAGED=$(git diff --cached --name-only 2>/dev/null || true)
+# Get all files currently staged for commit
+STAGED=$(git diff --cached --name-only)
 
-# For each staged .rs file, check README.md + Test.md in its dir and all parent dirs
-echo "$STAGED" | grep '\.rs$' 2>/dev/null || true | while IFS= read -r rs_file; do
-    [ -z "$rs_file" ] && continue
-    dir=$(dirname "$rs_file")
+# Identify if any Rust source files are being committed
+RS_FILES=$(echo "$STAGED" | grep '\.rs$' || true)
 
-    while [ "$dir" != "." ] && [ "$dir" != "/" ]; do
-        readme="$dir/README.md"
-        testmd="$dir/Test.md"
+if [ -n "$RS_FILES" ]; then
+    echo "$RS_FILES" | while IFS= read -r rs_file; do
+        [ -z "$rs_file" ] && continue
+        
+        # Start at the directory of the modified .rs file and walk up to the root
+        dir=$(dirname "$rs_file")
 
-        if [ -f "$readme" ] && git diff --name-only | grep -qF "$readme" 2>/dev/null && ! echo "$STAGED" | grep -qF "$readme"; then
-            echo "ERROR: $readme has changes but is not staged — stage it." >&2
-            exit 1
-        fi
+        while [ "$dir" != "." ] && [ "$dir" != "/" ]; do
+            readme="$dir/README.md"
+            testmd="$dir/Test.md"
 
-        if [ -f "$testmd" ] && git diff --name-only | grep -qF "$testmd" 2>/dev/null && ! echo "$STAGED" | grep -qF "$testmd"; then
-            echo "ERROR: $testmd has changes but is not staged — stage it." >&2
-            exit 1
-        fi
+            # RULE: If a README.md exists in this hierarchy, it MUST be staged
+            if [ -f "$readme" ]; then
+                if ! echo "$STAGED" | grep -x -q "$readme"; then
+                    echo "❌ ERROR: You modified '$rs_file'." >&2
+                    echo "   You MUST update and stage '$readme' to document your changes." >&2
+                    exit 1
+                fi
+            fi
 
-        parent=$(dirname "$dir")
-        [ "$parent" = "$dir" ] && break
-        dir="$parent"
-        [ ! -d "$dir" ] && break
-    done
-done
+            # RULE: If a Test.md exists in this hierarchy, it MUST be staged
+            if [ -f "$testmd" ]; then
+                if ! echo "$STAGED" | grep -x -q "$testmd"; then
+                    echo "❌ ERROR: You modified '$rs_file'." >&2
+                    echo "   You MUST update and stage '$testmd' to reflect test changes." >&2
+                    exit 1
+                fi
+            fi
 
-cargo check --quiet || { echo "ERROR: cargo check failed"; exit 1; }
-cargo fmt -- --check --quiet || { echo "ERROR: cargo fmt failed — run 'cargo fmt'"; exit 1; }
+            parent=$(dirname "$dir")
+            [ "$parent" = "$dir" ] && break
+            dir="$parent"
+        done
+    done || exit 1 # Ensure the exit 1 from the subshell kills the script
+fi
 
-echo "=== Pre-commit Passed ==="
+# Standard checks
+cargo check --quiet || { echo "❌ ERROR: cargo check failed"; exit 1; }
+cargo fmt -- --check --quiet || { echo "❌ ERROR: cargo fmt failed — run 'cargo fmt'"; exit 1; }
+
+echo "✅ Pre-commit Passed: Documentation and code are in sync."

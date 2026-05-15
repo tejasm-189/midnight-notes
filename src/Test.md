@@ -9,6 +9,7 @@ The following modules support end-to-end tests that span across multiple layers:
 | `crypto/` | 12 unit tests |
 | `storage/` | 9 unit tests |
 | `ui/editor/` | 13 unit tests |
+| `ui/` | 2 integration workflows (manual testing) |
 | `tests/` | 11 integration tests + 2 doc-tests |
 
 ## Running

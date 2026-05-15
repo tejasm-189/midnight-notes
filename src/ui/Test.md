@@ -13,6 +13,7 @@ UI components are primarily tested via visual inspection (Dioxus doesn't have a 
 |--------|-------------|
 | Vault Lock | Password input, biometric button, unlock flow |
 | Workspace | Note list, ProseEditor (live preview), CodeEditor (monospace), Vim mode, save, pin, archive, trash, context menu (⋮), tag chip filtering |
+| Settings | Sidebar nav, theme switching (Light/Dark/Midnight), About section |
 | Settings | Theme switching (Light/Dark/Midnight) |
 | Smart Views | Search query, results, linked graph |
 | Calendar | Month navigation, date selection, daily note creation, date format |
