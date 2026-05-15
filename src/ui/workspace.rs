@@ -34,10 +34,11 @@ pub fn Workspace(
     let mut content = use_signal(String::new);
     let mut query = use_signal(String::new);
     let mut note_tags = use_signal(Vec::<String>::new);
-    let mut all_tags = use_signal(Vec::<(String, String)>::new); // (id, name)
-    let mut snapshots = use_signal(Vec::<(String, String)>::new); // (id, created_at)
+    let mut all_tags = use_signal(Vec::<(String, String)>::new);
+    let mut snapshots = use_signal(Vec::<(String, String)>::new);
     let mut show_snapshots = use_signal(|| false);
     let mut tag_input = use_signal(String::new);
+    let mut note_tag_cache = use_signal(std::collections::HashMap::<String, Vec<String>>::new);
 
     // Pre-clone db for each closure
     let db_effect = db.clone();
@@ -70,8 +71,21 @@ pub fn Workspace(
     let db_export = db.clone();
     let db_import = db.clone();
 
+    let db_cache = db.clone();
     use_effect(move || {
         refresh_notes(&db_effect, &view.read(), &notes, &query.read());
+        if let Some(ref d) = db_cache {
+            let mut cache = std::collections::HashMap::<String, Vec<String>>::new();
+            for note in notes.read().iter() {
+                if let Ok(tags) = TagService::new(d).get_tags_for_note(&note.id) {
+                    cache.insert(
+                        note.id.clone(),
+                        tags.iter().map(|t| t.name.clone()).collect(),
+                    );
+                }
+            }
+            note_tag_cache.set(cache);
+        }
     });
 
     // Auto-save: debounced 2s after content/title changes
@@ -124,7 +138,7 @@ pub fn Workspace(
                     div { h1 { style: "font-family: Inter; font-size: 20px; font-weight: 600; color: {c.accent};", "Midnight Notes" } p { style: "font-size: 11px; color: {c.accent_green};", "Local-first Sync" } }
                 }
                 button { style: "margin: 0 16px 16px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;",
-                    onclick: move |_| { if let Some(ref d) = db_new { if let Ok(n) = NoteService::new(d).create("Untitled", "") { title.set(n.title.clone()); content.set(n.content.clone()); selected_id.set(Some(n.id.clone())); notes.write().insert(0, n); note_tags.set(vec![]); all_tags.set(vec![]); } } },
+                    onclick: move |_| { if let Some(ref d) = db_new { if let Ok(n) = NoteService::new(d).create("", "") { title.set(n.title.clone()); content.set(n.content.clone()); selected_id.set(Some(n.id.clone())); notes.write().insert(0, n); note_tags.set(vec![]); all_tags.set(vec![]); } } },
                     span { class: "material-symbols-outlined", style: "font-size: 16px;", "add" } "New Note"
                 }
                 div { style: "flex: 1; overflow-y: auto;",
@@ -220,6 +234,9 @@ pub fn Workspace(
                             rsx! {
                                 div { key: "{note.id}", style: "padding: 14px 16px; border-bottom: 1px solid {c.border}; background: {bg}; cursor: pointer; position: relative;",
                                     onclick: move |_| {
+                                        // Clean up whitespace-only title before switching
+                                        let cur_title = title.read().clone();
+                                        if !cur_title.trim().is_empty() { title.set(cur_title.trim().to_string()); }
                                         if let Some(ref d) = dc1 { if let Ok(Some(n)) = NoteService::new(d).get(&nid1) {
                                             selected_id.set(Some(nid1.clone())); title.set(n.title); content.set(n.content);
                                             if let Some(ref d) = dt { if let Ok(tags) = TagService::new(d).get_tags_for_note(&nid1) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); } if let Ok(h) = HistoryService::new(d).list(&nid1) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); } }
@@ -230,9 +247,20 @@ pub fn Workspace(
                                         h3 { style: "font-family: Inter; font-size: 14px; font-weight: 600; color: {tc}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;", "{note.title}" }
                                         if note.is_pinned { span { class: "material-symbols-outlined fill", style: "font-size: 14px; color: {c.accent};", "push_pin" } }
                                     }
-                                    p { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px;",
+                                    p { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px;",
                                         if note.content.is_empty() { "Empty note" } else { "{&note.content}" }
                                     }
+                                    // Tags on card
+                                    {let cache = note_tag_cache.read().get(&note.id).cloned().unwrap_or_default();
+                                    if !cache.is_empty() { rsx! {
+                                        div { style: "display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;",
+                                            {cache.iter().take(3).map(|t| rsx! {
+                                                span { key: "{t}", style: "font-size: 10px; color: {c.text_secondary}; background: {c.bg_surface}; padding: 1px 5px; border-radius: 2px; border: 1px solid {c.border}; font-family: 'JetBrains Mono', monospace;", "#{t}" }
+                                            })}
+                                            if cache.len() > 3 { span { style: "font-size: 10px; color: {c.text_muted};", "+{cache.len() - 3}" } }
+                                        }
+                                    }
+                                    } else { rsx! {} }}
                                     div { style: "display: flex; justify-content: space-between; align-items: center;",
                                         span { style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {c.text_secondary};", "{fmt_date(note)}" }
                                         if v == View::Trash {
@@ -319,7 +347,8 @@ pub fn Workspace(
                                             })}
                                         }
                                     }
-                                    input { r#type: "text", value: "{title}", oninput: move |e| title.set(e.value()),
+                                    input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
+                                        placeholder: "Untitled",
                                         style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
                                     }
                                     if *view.read() == View::Trash {
