@@ -41,6 +41,7 @@ pub fn Workspace(
     let mut show_snapshots = use_signal(|| false);
     let mut tag_input = use_signal(String::new);
     let mut note_tag_cache = use_signal(std::collections::HashMap::<String, Vec<String>>::new);
+    let _tag_version = use_signal(|| 0u32);
 
     // Pre-clone db for each closure
     let db_effect = db.clone();
@@ -74,6 +75,27 @@ pub fn Workspace(
     let db_daily = db.clone();
     let db_export = db.clone();
     let db_import = db.clone();
+
+    // Refresh tag cache and all_tags when note_tags changes
+    let db_tc = db.clone();
+    use_effect(move || {
+        let _ = note_tags.read().clone(); // subscribe to note_tags changes
+        if let Some(ref d) = db_tc {
+            let mut cache = std::collections::HashMap::<String, Vec<String>>::new();
+            for note in notes.read().iter() {
+                if let Ok(tags) = TagService::new(d).get_tags_for_note(&note.id) {
+                    cache.insert(
+                        note.id.clone(),
+                        tags.iter().map(|t| t.name.clone()).collect(),
+                    );
+                }
+            }
+            note_tag_cache.set(cache);
+            if let Ok(all) = TagService::new(d).get_all() {
+                all_tags.set(all.iter().map(|t| (t.id.clone(), t.name.clone())).collect());
+            }
+        }
+    });
 
     let db_cache = db.clone();
     use_effect(move || {
@@ -175,7 +197,8 @@ pub fn Workspace(
                         div { style: "padding: 4px 16px; font-size: 10px; color: {c.text_muted}; text-transform: uppercase; letter-spacing: 0.08em; display: flex; justify-content: space-between; align-items: center;",
                             span { "Tags" }
                             button { style: "background: none; border: none; color: {c.accent}; cursor: pointer; font-size: 14px; padding: 0;",
-                                onclick: move |_| { if let Some(ref d) = db_tag { if let Some(ref nid) = *selected_id.read() { let t = tag_input.read().clone(); if !t.is_empty() { if let Ok(Some(tag)) = TagService::new(d).get_by_name(&t) { let _ = TagService::new(d).assign_to_note(&tag.id, nid); } else if let Ok(new_tag) = TagService::new(d).create(&t, None, None) { let _ = TagService::new(d).assign_to_note(&new_tag.id, nid); } tag_input.set(String::new()); if let Ok(tags) = TagService::new(d).get_tags_for_note(nid) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); } if let Ok(h) = HistoryService::new(d).list(nid) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); } } } } },
+                                onclick: move |_| { if let Some(ref d) = db_tag { if let Some(ref nid) = *selected_id.read() { let t = tag_input.read().clone(); if !t.is_empty() { if let Ok(Some(tag)) = TagService::new(d).get_by_name(&t) { let _ = TagService::new(d).assign_to_note(&tag.id, nid); } else if let Ok(new_tag) = TagService::new(d).create(&t, None, None) { let _ = TagService::new(d).assign_to_note(&new_tag.id, nid); } tag_input.set(String::new()); if let Ok(tags) = TagService::new(d).get_tags_for_note(nid) {                             note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect());
+                        } if let Ok(h) = HistoryService::new(d).list(nid) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); } } } } },
                                 "+"
                             }
                         }
@@ -238,9 +261,9 @@ pub fn Workspace(
                     }
 
                     // Tag tree
-                    if view.read().clone() == View::AllNotes {
+                    if *view.read() == View::AllNotes {
                         div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
-                        crate::ui::sidebar::tag_tree::TagTree { db: db_tag5.clone(), on_search_tag: move |tag_name| { query.set(format!("tag:{}", tag_name)); refresh_notes(&db_side_all2, &View::AllNotes, &notes, &format!("tag:{}", tag_name)); } }
+                        crate::ui::sidebar::tag_tree::TagTree { key: "{all_tags.read().len()}", db: db_tag5.clone(), on_search_tag: move |tag_name| { query.set(format!("tag:{}", tag_name)); refresh_notes(&db_side_all2, &View::AllNotes, &notes, &format!("tag:{}", tag_name)); } }
                     }
                 }
 
