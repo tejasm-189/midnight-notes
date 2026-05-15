@@ -182,7 +182,7 @@ pub fn Workspace(
                     // Tag tree
                     if *view.read() == View::AllNotes {
                         div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
-                        crate::ui::sidebar::tag_tree::TagTree { db: db_tag5.clone(), selected_note_id: selected_id.read().clone(), on_search_tag: move |tag_name| { query.set(format!("tag:{}", tag_name)); refresh_notes(&db_side_all2, &View::AllNotes, &notes, &format!("tag:{}", tag_name)); } }
+                        crate::ui::sidebar::tag_tree::TagTree { db: db_tag5.clone(), on_search_tag: move |tag_name| { query.set(format!("tag:{}", tag_name)); refresh_notes(&db_side_all2, &View::AllNotes, &notes, &format!("tag:{}", tag_name)); } }
                     }
                 }
 

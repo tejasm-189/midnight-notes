@@ -11,14 +11,17 @@ pub fn BacklinksPanel(
 ) -> Element {
     let c = use_theme_colors();
     let mut mentions = use_signal(Vec::<Note>::new);
+    let nid = note_id.clone();
 
-    if let Some(ref nid) = note_id {
-        if let Some(ref d) = db {
-            if let Ok(m) = BacklinkService::new(d).get_linked_mentions(nid) {
-                mentions.set(m);
+    use_effect(move || {
+        if let Some(ref nid) = nid {
+            if let Some(ref d) = db {
+                if let Ok(m) = BacklinkService::new(d).get_linked_mentions(nid) {
+                    mentions.set(m);
+                }
             }
         }
-    }
+    });
 
     rsx! {
         div { style: "padding: 8px 16px;",

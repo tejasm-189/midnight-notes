@@ -6,17 +6,18 @@ use dioxus::prelude::*;
 #[component]
 pub fn TagTree(
     db: Option<std::sync::Arc<crate::storage::Database>>,
-    selected_note_id: Option<String>,
     on_search_tag: EventHandler<String>,
 ) -> Element {
     let c = use_theme_colors();
     let mut roots = use_signal(Vec::<Tag>::new);
 
-    if let Some(ref d) = db {
-        if let Ok(r) = TagService::new(d).list_roots() {
-            roots.set(r);
+    use_effect(move || {
+        if let Some(ref d) = db {
+            if let Ok(r) = TagService::new(d).list_roots() {
+                roots.set(r);
+            }
         }
-    }
+    });
 
     rsx! {
         div { style: "padding: 8px 16px;",
