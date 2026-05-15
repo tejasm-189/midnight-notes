@@ -3,21 +3,21 @@
 ## database.rs (4 tests)
 | Test | What it verifies |
 |------|-----------------|
-| `test_open_and_create` | Opening a DB creates the notes table |
-| `test_open_in_memory` | In-memory database works |
-| `test_open_twice` | Opening same file twice succeeds |
-| `test_encryption_key` | Set/get encryption key, is_encryption_enabled |
+| `opening_a_new_database_creates_notes_table` | Opening a DB creates the notes table |
+| `in_memory_database_works_correctly` | In-memory database works |
+| `opening_same_database_file_twice_succeeds` | Opening same file twice succeeds |
+| `setting_and_getting_encryption_key_works` | Set/get encryption key, is_encryption_enabled |
 
 ## migrations.rs (3 tests)
 | Test | What it verifies |
 |------|-----------------|
-| `test_migrations_run` | All tables (notes, tags, FTS5, etc.) created |
-| `test_migrations_idempotent` | Running migrations twice doesn't fail |
-| `test_schema_version` | Schema version matches migration count |
+| `all_migration_tables_are_created` | All tables (notes, tags, FTS5, etc.) created |
+| `running_migrations_twice_does_not_fail` | Running migrations twice doesn't fail |
+| `schema_version_matches_migration_count` | Schema version matches migration count |
 
 ## attachments.rs (3 tests)
 | Test | What it verifies |
 |------|-----------------|
-| `test_store_and_get` | Store bytes, read them back |
-| `test_delete` | Delete removes the file |
-| `test_not_found` | Getting nonexistent file returns error |
+| `storing_and_retrieving_attachment_bytes_works` | Store bytes, read them back |
+| `deleting_a_tag_removes_it_and_note_tags` | Delete removes the file |
+| `getting_nonexistent_attachment_returns_error` | Getting nonexistent file returns error |

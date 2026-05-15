@@ -17,8 +17,6 @@ enum View {
     Archived,
     Trash,
     SmartViews,
-    Calendar,
-    CalendarDate(String),
 }
 
 #[component]
@@ -41,6 +39,7 @@ pub fn Workspace(
     let mut show_snapshots = use_signal(|| false);
     let mut tag_input = use_signal(String::new);
     let mut note_tag_cache = use_signal(std::collections::HashMap::<String, Vec<String>>::new);
+    let mut show_calendar = use_signal(|| false);
     let _tag_version = use_signal(|| 0u32);
 
     // Pre-clone db for each closure
@@ -170,7 +169,7 @@ pub fn Workspace(
                 div { style: "flex: 1; overflow-y: auto;",
                     SidebarItem { icon: "description", label: "All Notes", active: matches!(view.read().clone(), View::AllNotes), onclick: move |_| { query.set(String::new()); view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
                     SidebarItem { icon: "auto_awesome", label: "Smart Views", active: matches!(view.read().clone(), View::SmartViews), onclick: move |_| view.set(View::SmartViews) }
-                    SidebarItem { icon: "calendar_month", label: "Calendar", active: matches!(*view.read(), View::Calendar | View::CalendarDate(_)), onclick: move |_| view.set(View::Calendar) }
+                    SidebarItem { icon: "calendar_month", label: "Calendar", active: *show_calendar.read(), onclick: move |_| { let c = *show_calendar.read(); show_calendar.set(!c); } }
                     SidebarItem { icon: "today", label: "Daily Note", active: false, onclick: move |_| {
                         if let Some(ref d) = db_daily {
                             let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
@@ -238,12 +237,11 @@ pub fn Workspace(
                     }
 
                     // Calendar panel
-                    if matches!(*view.read(), View::Calendar | View::CalendarDate(_)) {
+                    if *show_calendar.read() {
                         div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
                         crate::ui::sidebar::calendar::CalendarPanel {
                             db: db_tag5.clone(),
                             on_select_date: move |date_str: String| {
-                                view.set(View::CalendarDate(date_str.clone()));
                                 if let Some(ref d) = db_tag7 {
                                     let svc = NoteService::new(d);
                                     let existing = svc.search(&date_str).ok().and_then(|r| r.into_iter().find(|(n, _)| n.title.contains(&date_str)).map(|(n, _)| n));
@@ -278,7 +276,7 @@ pub fn Workspace(
             }
 
             // ====== NOTE LIST ======
-            if view.read().clone() != View::SmartViews && !matches!(*view.read(), View::Calendar | View::CalendarDate(_)) {
+            if view.read().clone() != View::SmartViews {
                 aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
                     div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
                         div { style: "position: relative;",
@@ -355,7 +353,7 @@ pub fn Workspace(
             }
 
             // ====== EDITOR ======
-            if view.read().clone() != View::SmartViews && view.read().clone() != View::Calendar {
+            if view.read().clone() != View::SmartViews {
                 section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
                     header { style: "height: 56px; background: {c.bg_canvas}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;",
                         div { style: "display: flex; background: {c.bg_surface}; border-radius: 4px; border: 1px solid {c.border}; padding: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px;",
@@ -466,7 +464,6 @@ fn get_empty_msg(view: &View) -> &'static str {
         View::Archived => "No archived notes",
         View::Trash => "Trash is empty",
         View::SmartViews => "No smart views yet",
-        View::Calendar | View::CalendarDate(_) => "Select a date from the calendar",
     }
 }
 
