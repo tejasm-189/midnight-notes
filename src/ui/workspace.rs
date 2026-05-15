@@ -40,6 +40,8 @@ pub fn Workspace(
     let mut tag_input = use_signal(String::new);
     let mut note_tag_cache = use_signal(std::collections::HashMap::<String, Vec<String>>::new);
     let mut show_calendar = use_signal(|| false);
+    let mut context_note = use_signal(|| None::<String>);
+
     let _tag_version = use_signal(|| 0u32);
 
     // Pre-clone db for each closure
@@ -137,29 +139,8 @@ pub fn Workspace(
         });
     });
 
-    let fmt_date = |note: &Note| -> String {
-        use chrono::Utc;
-        let now = Utc::now();
-        let diff = now - note.updated_at;
-        let is_yesterday = (now.date_naive() - note.updated_at.date_naive()).num_days() == 1;
-        if diff.num_minutes() < 1 {
-            "Just now".into()
-        } else if diff.num_hours() < 1 {
-            format!("{}m ago", diff.num_minutes())
-        } else if is_yesterday {
-            format!("Yesterday, {}", note.updated_at.format("%H:%M"))
-        } else if diff.num_days() < 1 {
-            format!("{}h ago", diff.num_hours())
-        } else if diff.num_days() == 1 {
-            "Yesterday".into()
-        } else if diff.num_days() < 7 {
-            format!("{}d ago", diff.num_days())
-        } else if diff.num_days() < 365 {
-            note.updated_at.format("%b %d").to_string()
-        } else {
-            note.updated_at.format("%b %d, %Y").to_string()
-        }
-    };
+    let fmt_date =
+        |note: &Note| -> String { note.updated_at.format("%a %d %b %Y %I:%M %p").to_string() };
 
     rsx! {
         div { style: "display: flex; height: 100vh; background: {c.bg_primary};",
@@ -296,17 +277,17 @@ pub fn Workspace(
                         }
                     }
                     div { style: "flex: 1; overflow-y: auto;",
-                        {let di = db.clone(); notes.read().iter().map(move |note| {
+                        {let di = db.clone(); let db_ctx = db.clone(); notes.read().iter().map(move |note| {
                             let act = selected_id.read().as_deref() == Some(&note.id);
                             let bg = if act { c.bg_surface_high } else { "transparent" };
                             let tc = if act { c.accent } else { c.text_primary };
-                            let nid1 = note.id.clone(); let nid2 = note.id.clone();
+                            let nid1 = note.id.clone(); let nid2 = note.id.clone(); let nid3 = note.id.clone();
                             let dc1 = di.clone(); let dc2 = di.clone();
                             let dt = db_tag2.clone();
                             let v = view.read().clone();
                             rsx! {
-                                div { key: "{note.id}", style: "padding: 14px 16px; border-bottom: 1px solid {c.border}; background: {bg}; cursor: pointer; position: relative;",
-                                    onclick: move |_| {
+                                 div { key: "{note.id}", style: "padding: 14px 16px; border-bottom: 1px solid {c.border}; background: {bg}; cursor: pointer; position: relative;",
+                                     onclick: move |_| { context_note.set(None);
                                         // Clean up whitespace-only title before switching
                                         let cur_title = title.read().clone();
                                         if !cur_title.trim().is_empty() { title.set(cur_title.trim().to_string()); }
@@ -323,20 +304,32 @@ pub fn Workspace(
                                     p { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px;",
                                         if note.content.is_empty() { "Empty note" } else { "{&note.content}" }
                                     }
-                                    // Tags on card
+                                    // Tags on card — clickable to filter
                                     {let cache = note_tag_cache.read().get(&note.id).cloned().unwrap_or_default();
+                                    let db_tc = db_ctx.clone();
                                     if !cache.is_empty() { rsx! {
                                         div { style: "display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;",
-                                            {cache.iter().take(3).map(|t| rsx! {
-                                                span { key: "{t}", style: "font-size: 10px; color: {c.text_secondary}; background: {c.bg_surface}; padding: 1px 5px; border-radius: 2px; border: 1px solid {c.border}; font-family: 'JetBrains Mono', monospace;", "#{t}" }
+                                            {cache.iter().take(3).map(|t| {
+                                                let tn = t.clone();
+                                                let d_tc = db_tc.clone();
+                                                rsx! {
+                                                    span { key: "{t}", style: "font-size: 10px; color: {c.accent}; background: {c.bg_surface_high}; padding: 1px 5px; border-radius: 2px; border: 1px solid {c.accent}; font-family: 'JetBrains Mono', monospace; cursor: pointer;",
+                                                        onclick: move |_| { query.set(format!("tag:{}", tn)); refresh_notes(&d_tc, &View::AllNotes, &notes, &format!("tag:{}", tn)); },
+                                                        "#{t}"
+                                                    }
+                                                }
                                             })}
                                             if cache.len() > 3 { span { style: "font-size: 10px; color: {c.text_muted};", "+{cache.len() - 3}" } }
                                         }
                                     }
                                     } else { rsx! {} }}
                                     div { style: "display: flex; justify-content: space-between; align-items: center;",
-                                        span { style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {c.text_secondary};", "{fmt_date(note)}" }
-                                        if v == View::Trash {
+                                         span { style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {c.text_secondary};", "{fmt_date(note)}" }
+                                         button { style: "background: none; border: none; color: {c.text_muted}; cursor: pointer; padding: 2px; font-size: 14px;",
+                                             onclick: move |_| context_note.set(Some(nid3.clone())),
+                                             span { class: "material-symbols-outlined", style: "font-size: 14px;", "more_vert" }
+                                         }
+                                         if v == View::Trash {
                                             button { style: "font-family: 'JetBrains Mono', monospace; font-size: 10px; color: {c.error}; background: none; border: none; cursor: pointer;",
                                                 onclick: move |_| { if let Some(ref d) = dc2 { let _ = NoteService::new(d).delete_permanently(&nid2); let mut n = notes; n.write().retain(|x| x.id != nid2); } },
                                                 "Delete permanently"
@@ -346,11 +339,28 @@ pub fn Workspace(
                                 }
                             }
                         })}
-                        if notes.read().is_empty() {
-                            div { style: "padding: 32px; text-align: center; font-family: Inter; font-size: 13px; color: {c.text_muted};", p { "{get_empty_msg(&*view.read())}" } }
-                        }
+                    if notes.read().is_empty() {
+                        div { style: "padding: 32px; text-align: center; font-family: Inter; font-size: 13px; color: {c.text_muted};", p { "{get_empty_msg(&*view.read())}" } }
                     }
+                    // Context menu
+                    {context_note.read().as_ref().map(move |cid| {
+                        let cid_pin = cid.clone(); let cid_arch = cid.clone(); let cid_del = cid.clone();
+                        let db_cpin2 = db.clone(); let db_carch2 = db.clone(); let db_cdel2 = db.clone();
+                        let db_rp = db.clone(); let db_ra = db.clone(); let db_rd = db.clone();
+                        rsx! {
+                            div { key: "ctx-overlay", style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 999;",
+                                onclick: move |_| context_note.set(None),
+                                div { style: "position: absolute; top: 10px; left: 10px; background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; padding: 4px 0; min-width: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 1000;",
+                                    ctx_item { label: "Pin / Unpin", icon: "push_pin", c: c, onclick: move |_| { if let Some(ref d) = db_cpin2 { let _ = NoteService::new(d).toggle_pin(&cid_pin); } context_note.set(None); refresh_notes(&db_rp, &View::AllNotes, &notes, ""); } }
+                                    ctx_item { label: "Archive", icon: "archive", c: c, onclick: move |_| { if let Some(ref d) = db_carch2 { let _ = NoteService::new(d).toggle_archive(&cid_arch); } context_note.set(None); refresh_notes(&db_ra, &View::AllNotes, &notes, ""); } }
+                                    div { style: "height: 1px; background: {c.border}; margin: 4px 0;" }
+                                    ctx_item { label: "Delete permanently", icon: "delete", c: c, onclick: move |_| { if let Some(ref d) = db_cdel2 { let _ = NoteService::new(d).delete_permanently(&cid_del); } context_note.set(None); refresh_notes(&db_rd, &View::AllNotes, &notes, ""); } }
+                                }
+                            }
+                        }
+                    })}
                 }
+            }
             } else if view.read().clone() == View::SmartViews {
                 crate::ui::smart_view::SmartViewPanel { db: db.clone(), on_select: move |note_id: String| {
                     if let Some(ref d) = db_smart { if let Ok(Some(n)) = NoteService::new(d).get(&note_id) {
@@ -515,6 +525,23 @@ fn SidebarItem(icon: String, label: String, active: bool, onclick: EventHandler<
         a { style: "display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: {bg}; color: {color}; border-left: {left}; cursor: pointer; font-size: 11px;",
             onclick: move |_| onclick.call(()),
             span { class: "material-symbols-outlined", style: "font-size: 18px;", "{icon}" }
+            span { "{label}" }
+        }
+    }
+}
+
+#[component]
+#[component]
+fn ctx_item(
+    label: String,
+    icon: String,
+    c: crate::ui::theme::ThemeColors,
+    onclick: EventHandler<()>,
+) -> Element {
+    rsx! {
+        div { style: "display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer; font-size: 12px; color: {c.text_secondary}; font-family: Inter; transition: background 0.1s;",
+            onclick: move |_| onclick.call(()),
+            span { class: "material-symbols-outlined", style: "font-size: 16px;", "{icon}" }
             span { "{label}" }
         }
     }
