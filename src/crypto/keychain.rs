@@ -73,7 +73,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_derive_key_deterministic() {
+    fn same_password_and_salt_produce_same_key() {
         let salt = generate_salt();
         let key1 = derive_key("testpassword", &salt).unwrap();
         let key2 = derive_key("testpassword", &salt).unwrap();
@@ -81,7 +81,7 @@ mod tests {
     }
 
     #[test]
-    fn test_derive_key_different_salt() {
+    fn different_salts_produce_different_keys() {
         let salt1 = generate_salt();
         let salt2 = generate_salt();
         let key1 = derive_key("testpassword", &salt1).unwrap();
@@ -90,32 +90,32 @@ mod tests {
     }
 
     #[test]
-    fn test_derive_key_length() {
+    fn derived_key_is_32_bytes() {
         let salt = generate_salt();
         let key = derive_key("testpassword", &salt).unwrap();
         assert_eq!(key.len(), 32);
     }
 
     #[test]
-    fn test_generate_salt_length() {
+    fn generated_salt_is_16_bytes() {
         let salt = generate_salt();
         assert_eq!(salt.len(), 16);
     }
 
     #[test]
-    fn test_generate_salt_unique() {
+    fn consecutive_salts_are_unique() {
         let salt1 = generate_salt();
         let salt2 = generate_salt();
         assert_ne!(salt1, salt2);
     }
 
     #[test]
-    fn test_validate_password_strength_valid() {
+    fn password_with_8_or_more_chars_is_accepted() {
         assert!(validate_password_strength("longenoughpassword").is_ok());
     }
 
     #[test]
-    fn test_validate_password_strength_short() {
+    fn password_with_less_than_8_chars_is_rejected() {
         assert!(validate_password_strength("short").is_err());
     }
 }

@@ -152,32 +152,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_filter_commands_empty() {
+    fn empty_query_returns_all_commands() {
         let results = filter_commands("");
         assert_eq!(results.len(), SLASH_COMMANDS.len());
     }
 
     #[test]
-    fn test_filter_commands_table() {
+    fn tab_query_matches_table_command() {
         let results = filter_commands("tab");
         assert!(results.iter().any(|c| c.trigger == "table"));
     }
 
     #[test]
-    fn test_filter_commands_code() {
+    fn code_query_matches_code_block_command() {
         let results = filter_commands("code");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].trigger, "code");
     }
 
     #[test]
-    fn test_filter_commands_no_match() {
+    fn unknown_query_returns_empty_results() {
         let results = filter_commands("xyznonexistent");
         assert!(results.is_empty());
     }
 
     #[test]
-    fn test_find_exact_command() {
+    fn exact_trigger_match_finds_command() {
         assert!(find_exact_command("table").is_some());
         assert!(find_exact_command("nonexistent").is_none());
     }

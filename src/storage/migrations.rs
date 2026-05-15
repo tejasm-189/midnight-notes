@@ -106,7 +106,7 @@ mod tests {
     use rusqlite::Connection;
 
     #[test]
-    fn test_migrations_run() {
+    fn all_migration_tables_are_created() {
         let conn = Connection::open_in_memory().unwrap();
         run(&conn).unwrap();
 
@@ -139,14 +139,14 @@ mod tests {
     }
 
     #[test]
-    fn test_migrations_idempotent() {
+    fn running_migrations_twice_does_not_fail() {
         let conn = Connection::open_in_memory().unwrap();
         run(&conn).unwrap();
         run(&conn).unwrap(); // second run should not fail
     }
 
     #[test]
-    fn test_schema_version() {
+    fn schema_version_matches_migration_count() {
         let conn = Connection::open_in_memory().unwrap();
         run(&conn).unwrap();
 

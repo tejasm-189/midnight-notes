@@ -80,7 +80,7 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
-    fn test_open_and_create() {
+    fn opening_a_new_database_creates_notes_table() {
         let dir = tempdir().unwrap();
         let db_path = dir.path().join("test.db");
         let db = Database::open(&db_path).unwrap();
@@ -92,7 +92,7 @@ mod tests {
     }
 
     #[test]
-    fn test_open_in_memory() {
+    fn in_memory_database_works_correctly() {
         let db = Database::open_in_memory().unwrap();
         let conn = db.conn();
         let count: i64 = conn
@@ -102,7 +102,7 @@ mod tests {
     }
 
     #[test]
-    fn test_open_twice() {
+    fn opening_same_database_file_twice_succeeds() {
         let dir = tempdir().unwrap();
         let db_path = dir.path().join("test2.db");
         Database::open(&db_path).unwrap();
@@ -110,7 +110,7 @@ mod tests {
     }
 
     #[test]
-    fn test_encryption_key() {
+    fn setting_and_getting_encryption_key_works() {
         let db = Database::open_in_memory().unwrap();
         assert!(!db.is_encryption_enabled());
         db.set_encryption_key([0x42u8; 32]);

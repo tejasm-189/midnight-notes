@@ -85,7 +85,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_normal_to_insert() {
+    fn pressing_i_switches_normal_to_insert_mode() {
         assert_eq!(
             process_vim_key(VimMode::Normal, "i"),
             (VimMode::Insert, false)
@@ -97,7 +97,7 @@ mod tests {
     }
 
     #[test]
-    fn test_insert_to_normal() {
+    fn pressing_escape_switches_insert_to_normal_mode() {
         assert_eq!(
             process_vim_key(VimMode::Insert, "Escape"),
             (VimMode::Normal, false)
@@ -105,7 +105,7 @@ mod tests {
     }
 
     #[test]
-    fn test_insert_passthrough() {
+    fn character_keys_pass_through_in_insert_mode() {
         assert_eq!(
             process_vim_key(VimMode::Insert, "h"),
             (VimMode::Insert, true)
@@ -113,7 +113,7 @@ mod tests {
     }
 
     #[test]
-    fn test_normal_to_visual() {
+    fn pressing_v_switches_to_visual_mode() {
         assert_eq!(
             process_vim_key(VimMode::Normal, "v"),
             (VimMode::Visual, false)
@@ -121,7 +121,7 @@ mod tests {
     }
 
     #[test]
-    fn test_visual_to_normal() {
+    fn pressing_escape_returns_to_normal_mode() {
         assert_eq!(
             process_vim_key(VimMode::Visual, "Escape"),
             (VimMode::Normal, false)
@@ -129,7 +129,7 @@ mod tests {
     }
 
     #[test]
-    fn test_normal_to_command() {
+    fn pressing_colon_switches_to_command_mode() {
         assert_eq!(
             process_vim_key(VimMode::Normal, ":"),
             (VimMode::Command, false)
@@ -137,7 +137,7 @@ mod tests {
     }
 
     #[test]
-    fn test_command_enter() {
+    fn pressing_enter_in_command_mode_returns_to_normal() {
         assert_eq!(
             process_vim_key(VimMode::Command, "Enter"),
             (VimMode::Normal, false)
@@ -145,7 +145,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mode_labels() {
+    fn each_vim_mode_has_correct_label() {
         assert_eq!(VimMode::Normal.label(), "NORMAL");
         assert_eq!(VimMode::Insert.label(), "INSERT");
         assert_eq!(VimMode::Visual.label(), "VISUAL");

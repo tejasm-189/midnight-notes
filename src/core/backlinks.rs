@@ -150,31 +150,31 @@ mod tests {
     }
 
     #[test]
-    fn test_extract_links() {
+    fn extracting_wiki_links_from_content_returns_titles() {
         let links = BacklinkService::extract_links("See [[Data Models]] and [[API Design]].");
         assert_eq!(links, vec!["Data Models", "API Design"]);
     }
 
     #[test]
-    fn test_extract_links_no_matches() {
+    fn content_without_wiki_links_returns_empty() {
         let links = BacklinkService::extract_links("No links here.");
         assert!(links.is_empty());
     }
 
     #[test]
-    fn test_extract_links_empty_content() {
+    fn empty_content_returns_empty_link_list() {
         let links = BacklinkService::extract_links("");
         assert!(links.is_empty());
     }
 
     #[test]
-    fn test_extract_links_trims_whitespace() {
+    fn wiki_links_with_whitespace_are_trimmed() {
         let links = BacklinkService::extract_links("[[  Spaced Out  ]]");
         assert_eq!(links, vec!["Spaced Out"]);
     }
 
     #[test]
-    fn test_refresh_and_get_mentions() {
+    fn refreshing_backlinks_and_getting_mentions_works() {
         with_services(|note_svc, bl_svc| {
             let target = note_svc.create("Target Note", "Content").unwrap();
             let source = note_svc
@@ -188,7 +188,7 @@ mod tests {
     }
 
     #[test]
-    fn test_outgoing_links() {
+    fn getting_outgoing_links_from_a_note_works() {
         with_services(|note_svc, bl_svc| {
             let target = note_svc.create("Target", "Content").unwrap();
             let source = note_svc
@@ -202,7 +202,7 @@ mod tests {
     }
 
     #[test]
-    fn test_refresh_replaces_old_links() {
+    fn refreshing_backlinks_replaces_previous_links() {
         with_services(|note_svc, bl_svc| {
             let t1 = note_svc.create("Target1", "C").unwrap();
             let t2 = note_svc.create("Target2", "C").unwrap();
@@ -216,7 +216,7 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_title_exact() {
+    fn resolving_exact_title_match_returns_note_id() {
         with_services(|note_svc, bl_svc| {
             let note = note_svc.create("Exact Title", "Content").unwrap();
             let found = bl_svc.resolve_title("Exact Title").unwrap().unwrap();
@@ -225,7 +225,7 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_title_nonexistent() {
+    fn resolving_nonexistent_title_returns_none() {
         with_services(|_note_svc, bl_svc| {
             let result = bl_svc.resolve_title("Nonexistent Note").unwrap();
             assert!(result.is_none());

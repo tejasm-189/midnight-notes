@@ -204,35 +204,35 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_query_plain() {
+    fn plain_text_query_has_no_filters() {
         let (fts, filters) = SearchService::parse_query("hello world");
         assert_eq!(fts, "hello world");
         assert!(filters.tag.is_none());
     }
 
     #[test]
-    fn test_parse_query_with_tag() {
+    fn tag_prefix_extracts_tag_filter() {
         let (fts, filters) = SearchService::parse_query("tag:work database");
         assert_eq!(filters.tag.unwrap(), "work");
         assert_eq!(fts, "database");
     }
 
     #[test]
-    fn test_parse_query_has_todo() {
+    fn has_todo_prefix_extracts_todo_filter() {
         let (fts, filters) = SearchService::parse_query("meeting has:todo");
         assert_eq!(filters.has_todo, Some(true));
         assert_eq!(fts, "meeting");
     }
 
     #[test]
-    fn test_parse_query_path() {
+    fn path_prefix_extracts_path_filter() {
         let (fts, filters) = SearchService::parse_query("path:docs/ architecture");
         assert_eq!(filters.path.unwrap(), "docs/");
         assert_eq!(fts, "architecture");
     }
 
     #[test]
-    fn test_parse_query_all_filters() {
+    fn multiple_filters_are_all_extracted() {
         let (fts, filters) = SearchService::parse_query("tag:backend path:src/ has:todo rust");
         assert_eq!(filters.tag.unwrap(), "backend");
         assert_eq!(filters.path.unwrap(), "src/");
@@ -241,7 +241,7 @@ mod tests {
     }
 
     #[test]
-    fn test_search_basic() {
+    fn fts5_search_returns_matching_notes() {
         with_setup(|note_svc, search_svc| {
             note_svc
                 .create("Rust Notes", "Learn about ownership")
@@ -256,7 +256,7 @@ mod tests {
     }
 
     #[test]
-    fn test_search_no_results() {
+    fn search_with_no_matches_returns_empty() {
         with_setup(|note_svc, search_svc| {
             note_svc.create("Test Note", "Content").unwrap();
             let results = search_svc.search("nonexistent").unwrap();
@@ -265,7 +265,7 @@ mod tests {
     }
 
     #[test]
-    fn test_smart_view_crud() {
+    fn saving_listing_and_deleting_smart_views_works() {
         with_setup(|_note_svc, search_svc| {
             search_svc.save_smart_view("TODO", "has:todo").unwrap();
             search_svc
@@ -280,7 +280,7 @@ mod tests {
     }
 
     #[test]
-    fn test_smart_view_execute() {
+    fn executing_saved_smart_view_returns_results() {
         with_setup(|note_svc, search_svc| {
             note_svc
                 .create("Architecture Overview", "System design document")

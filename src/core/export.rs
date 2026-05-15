@@ -192,7 +192,7 @@ mod tests {
     }
 
     #[test]
-    fn test_export_import_roundtrip() {
+    fn exporting_then_importing_preserves_content() {
         with_setup(|note_svc, export_svc| {
             let note = note_svc.create("Export Test", "Secret content").unwrap();
             let dir = tempdir().unwrap();
@@ -211,7 +211,7 @@ mod tests {
     }
 
     #[test]
-    fn test_wrong_password_fails() {
+    fn importing_with_wrong_password_fails() {
         with_setup(|note_svc, export_svc| {
             let note = note_svc.create("Test", "Content").unwrap();
             let dir = tempdir().unwrap();
@@ -227,7 +227,7 @@ mod tests {
     }
 
     #[test]
-    fn test_export_empty_list() {
+    fn exporting_with_no_notes_still_works() {
         with_setup(|_note_svc, export_svc| {
             let dir = tempdir().unwrap();
             let zip_path = dir.path().join("empty.zip");

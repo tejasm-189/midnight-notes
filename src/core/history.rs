@@ -164,7 +164,7 @@ mod tests {
     }
 
     #[test]
-    fn test_list_history_empty() {
+    fn new_note_has_no_version_history() {
         with_setup(|note_svc, hist_svc| {
             let note = note_svc.create("Test", "Content").unwrap();
             let history = hist_svc.list(&note.id).unwrap();
@@ -173,7 +173,7 @@ mod tests {
     }
 
     #[test]
-    fn test_list_history_after_update() {
+    fn updating_a_note_creates_a_snapshot() {
         with_setup(|note_svc, hist_svc| {
             let note = note_svc.create("Test", "Original").unwrap();
             note_svc.update(&note.id, "Test", "Updated").unwrap();
@@ -184,7 +184,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_snapshot() {
+    fn getting_snapshot_by_id_returns_correct_data() {
         with_setup(|note_svc, hist_svc| {
             let note = note_svc.create("Test", "V1").unwrap();
             note_svc.update(&note.id, "Test", "V2").unwrap();
@@ -195,7 +195,7 @@ mod tests {
     }
 
     #[test]
-    fn test_restore_snapshot() {
+    fn restoring_snapshot_reverts_content() {
         with_setup(|note_svc, hist_svc| {
             let note = note_svc.create("Test", "V1").unwrap();
             note_svc.update(&note.id, "Test", "V2").unwrap();
@@ -207,7 +207,7 @@ mod tests {
     }
 
     #[test]
-    fn test_diff_snapshots() {
+    fn diffing_two_snapshots_shows_changes() {
         with_setup(|note_svc, hist_svc| {
             let note = note_svc.create("Test", "Hello World").unwrap();
             note_svc.update(&note.id, "Test", "Hello Rust").unwrap();
@@ -220,7 +220,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_nonexistent() {
+    fn getting_nonexistent_snapshot_returns_none() {
         with_setup(|_note_svc, hist_svc| {
             let result = hist_svc.get("nonexistent").unwrap();
             assert!(result.is_none());

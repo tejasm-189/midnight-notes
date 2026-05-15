@@ -80,7 +80,7 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
-    fn test_watch_directory() {
+    fn creating_a_file_triggers_watcher_event() {
         let dir = tempdir().unwrap();
         let watcher = FileWatcher::watch(dir.path()).unwrap();
 

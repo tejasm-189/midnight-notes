@@ -312,7 +312,7 @@ mod tests {
     }
 
     #[test]
-    fn test_create_note() {
+    fn creating_a_note_with_title_and_content_succeeds() {
         with_service(|service| {
             let note = service.create("Test Title", "Test Content").unwrap();
             assert_eq!(note.title, "Test Title");
@@ -321,7 +321,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_note() {
+    fn getting_a_note_by_id_returns_correct_note() {
         with_service(|service| {
             let created = service.create("Get Test", "Content").unwrap();
             let fetched = service.get(&created.id).unwrap().unwrap();
@@ -330,7 +330,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_nonexistent() {
+    fn getting_nonexistent_snapshot_returns_none() {
         with_service(|service| {
             let result = service.get("nonexistent-id").unwrap();
             assert!(result.is_none());
@@ -338,7 +338,7 @@ mod tests {
     }
 
     #[test]
-    fn test_update_note() {
+    fn updating_note_title_and_content_persists_changes() {
         with_service(|service| {
             let note = service.create("Original", "Original content").unwrap();
             service
@@ -351,7 +351,7 @@ mod tests {
     }
 
     #[test]
-    fn test_trash_and_list() {
+    fn trashing_a_note_moves_it_from_active_to_trash() {
         with_service(|service| {
             let note = service.create("To Trash", "Content").unwrap();
             service.trash(&note.id).unwrap();
@@ -363,7 +363,7 @@ mod tests {
     }
 
     #[test]
-    fn test_delete_note() {
+    fn permanently_deleting_a_note_removes_it() {
         with_service(|service| {
             let note = service.create("To Delete", "Content").unwrap();
             service.delete(&note.id).unwrap();
@@ -373,7 +373,7 @@ mod tests {
     }
 
     #[test]
-    fn test_toggle_pin() {
+    fn toggling_pin_flips_the_pinned_flag() {
         with_service(|service| {
             let note = service.create("Pin Test", "Content").unwrap();
             assert!(!note.is_pinned);
@@ -385,7 +385,7 @@ mod tests {
     }
 
     #[test]
-    fn test_list_active_ordering() {
+    fn pinned_notes_appear_first_in_active_list() {
         with_service(|service| {
             let n1 = service.create("Alpha", "Content").unwrap();
             let _ = service.create("Beta", "Content").unwrap();
@@ -396,7 +396,7 @@ mod tests {
     }
 
     #[test]
-    fn test_list_archived() {
+    fn archived_notes_appear_in_archived_list() {
         with_service(|service| {
             let note = service.create("Test", "Content").unwrap();
             service.toggle_archive(&note.id).unwrap();
@@ -407,7 +407,7 @@ mod tests {
     }
 
     #[test]
-    fn test_restore_from_trash() {
+    fn restoring_a_trashed_note_returns_it_to_active() {
         with_service(|service| {
             let note = service.create("Test", "Content").unwrap();
             service.trash(&note.id).unwrap();
@@ -418,7 +418,7 @@ mod tests {
     }
 
     #[test]
-    fn test_delete_permanently() {
+    fn permanently_deleted_note_cannot_be_retrieved() {
         with_service(|service| {
             let note = service.create("Test", "Content").unwrap();
             service.delete_permanently(&note.id).unwrap();
@@ -427,7 +427,7 @@ mod tests {
     }
 
     #[test]
-    fn test_search() {
+    fn fts5_search_finds_matching_notes() {
         with_service(|service| {
             service
                 .create("Rust Programming", "Learn about ownership")

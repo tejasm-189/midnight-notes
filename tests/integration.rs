@@ -12,7 +12,7 @@ fn setup_db() -> Database {
 }
 
 #[test]
-fn test_note_lifecycle() {
+fn full_note_lifecycle_create_read_update_pin_archive_trash_delete() {
     let db = setup_db();
     let svc = NoteService::new(&db);
 
@@ -55,7 +55,7 @@ fn test_note_lifecycle() {
 }
 
 #[test]
-fn test_tags_and_notes() {
+fn creating_assigning_and_removing_tags_from_notes() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let tag_svc = TagService::new(&db);
@@ -84,7 +84,7 @@ fn test_tags_and_notes() {
 }
 
 #[test]
-fn test_backlinks_graph() {
+fn backlinks_refresh_mentions_outgoing_and_clear() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let bl_svc = BacklinkService::new(&db);
@@ -113,7 +113,7 @@ fn test_backlinks_graph() {
 }
 
 #[test]
-fn test_fts5_search() {
+fn fts5_search_finds_notes_and_smart_views_execute() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let search_svc = SearchService::new(&db);
@@ -136,7 +136,7 @@ fn test_fts5_search() {
 }
 
 #[test]
-fn test_version_history() {
+fn version_snapshots_on_update_diff_and_restore() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let hist_svc = HistoryService::new(&db);
@@ -161,7 +161,7 @@ fn test_version_history() {
 }
 
 #[test]
-fn test_encrypted_export_import() {
+fn encrypted_zip_export_import_preserves_content() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let export_svc = ExportService::new(&db);
@@ -181,7 +181,7 @@ fn test_encrypted_export_import() {
 }
 
 #[test]
-fn test_markdown_rendering() {
+fn markdown_renders_html_and_plain_text_extraction() {
     let html = markdown::render_markdown("# Hello\n**bold**");
     assert!(html.contains("<h1>"));
     assert!(html.contains("<strong>bold</strong>"));
@@ -197,7 +197,7 @@ fn test_markdown_rendering() {
 }
 
 #[test]
-fn test_tag_tree() {
+fn tag_parent_child_hierarchy_update_and_delete() {
     let db = setup_db();
     let tag_svc = TagService::new(&db);
 
@@ -227,7 +227,7 @@ fn test_tag_tree() {
 }
 
 #[test]
-fn test_search_filters() {
+fn searching_with_tag_filter_combined_with_text() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let tag_svc = TagService::new(&db);
@@ -243,7 +243,7 @@ fn test_search_filters() {
 }
 
 #[test]
-fn test_tag_search_workflow() {
+fn tagging_notes_and_searching_by_tag_integration() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let tag_svc = TagService::new(&db);
@@ -279,7 +279,7 @@ fn test_tag_search_workflow() {
 }
 
 #[test]
-fn test_restore_workflow() {
+fn trashing_restoring_and_history_preserved() {
     let db = setup_db();
     let note_svc = NoteService::new(&db);
     let hist_svc = HistoryService::new(&db);

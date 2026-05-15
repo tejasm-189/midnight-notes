@@ -168,13 +168,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_empty_plugin_manager() {
+    fn new_plugin_manager_has_no_plugins() {
         let mgr = PluginManager::new();
         assert!(mgr.list().is_empty());
     }
 
     #[test]
-    fn test_load_nonexistent_directory() {
+    fn loading_from_nonexistent_directory_returns_empty() {
         let mut mgr = PluginManager::new();
         let loaded = mgr
             .load_from_directory(Path::new("/nonexistent/plugins"))
@@ -183,7 +183,7 @@ mod tests {
     }
 
     #[test]
-    fn test_process_all_empty() {
+    fn processing_with_no_plugins_returns_empty() {
         let mut mgr = PluginManager::new();
         let results = mgr.process_all("test input");
         assert!(results.is_empty());

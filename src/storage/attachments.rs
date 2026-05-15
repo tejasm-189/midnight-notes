@@ -71,7 +71,7 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
-    fn test_store_and_get() {
+    fn storing_and_retrieving_attachment_bytes_works() {
         let dir = tempdir().unwrap();
         let mgr = AttachmentManager::new(dir.path().join(".attachments"));
         let path = mgr.store("test.txt", b"hello world").unwrap();
@@ -81,7 +81,7 @@ mod tests {
     }
 
     #[test]
-    fn test_delete() {
+    fn deleting_a_tag_removes_it_and_note_tags() {
         let dir = tempdir().unwrap();
         let mgr = AttachmentManager::new(dir.path().join(".attachments"));
         let path = mgr.store("test.txt", b"data").unwrap();
@@ -90,7 +90,7 @@ mod tests {
     }
 
     #[test]
-    fn test_not_found() {
+    fn getting_nonexistent_attachment_returns_error() {
         let dir = tempdir().unwrap();
         let mgr = AttachmentManager::new(dir.path().join(".attachments"));
         let result = mgr.get("nonexistent.txt");

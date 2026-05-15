@@ -84,7 +84,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_xchacha20_roundtrip() {
+    fn xchacha20_encrypt_then_decrypt_returns_original() {
         let key = [0x42u8; 32];
         let plaintext = b"Hello, Midnight Notes!";
         let encrypted = xchacha20_encrypt(&key, plaintext).unwrap();
@@ -93,7 +93,7 @@ mod tests {
     }
 
     #[test]
-    fn test_xchacha20_wrong_key() {
+    fn xchacha20_with_wrong_key_fails_decryption() {
         let key1 = [0x42u8; 32];
         let key2 = [0x24u8; 32];
         let plaintext = b"secret data";
@@ -102,7 +102,7 @@ mod tests {
     }
 
     #[test]
-    fn test_xchacha20_unique_nonce() {
+    fn xchacha20_produces_different_ciphertext_for_same_plaintext() {
         let key = [0x42u8; 32];
         let plaintext = b"same data";
         let e1 = xchacha20_encrypt(&key, plaintext).unwrap();
@@ -111,7 +111,7 @@ mod tests {
     }
 
     #[test]
-    fn test_aes256gcm_roundtrip() {
+    fn aes256gcm_encrypt_then_decrypt_returns_original() {
         let key = [0x42u8; 32];
         let plaintext = b"Hello, AES-256-GCM!";
         let encrypted = aes256gcm_encrypt(&key, plaintext).unwrap();
@@ -120,7 +120,7 @@ mod tests {
     }
 
     #[test]
-    fn test_encrypt_empty() {
+    fn encrypting_and_decrypting_empty_data_succeeds() {
         let key = [0x42u8; 32];
         let encrypted = xchacha20_encrypt(&key, b"").unwrap();
         let decrypted = xchacha20_decrypt(&key, &encrypted).unwrap();

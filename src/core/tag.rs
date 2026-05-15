@@ -208,7 +208,7 @@ mod tests {
     }
 
     #[test]
-    fn test_create_and_get() {
+    fn creating_a_tag_and_getting_by_id_returns_it() {
         with_service(|svc| {
             let tag = svc.create("work", None, None).unwrap();
             assert_eq!(tag.name, "work");
@@ -218,7 +218,7 @@ mod tests {
     }
 
     #[test]
-    fn test_create_with_parent() {
+    fn creating_a_tag_with_parent_creates_hierarchy() {
         with_service(|svc| {
             let parent = svc.create("work", None, None).unwrap();
             let child = svc.create("projects", Some(&parent.id), None).unwrap();
@@ -227,7 +227,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_by_name() {
+    fn getting_a_tag_by_name_returns_correct_tag() {
         with_service(|svc| {
             svc.create("unique-name", None, None).unwrap();
             let tag = svc.get_by_name("unique-name").unwrap().unwrap();
@@ -236,7 +236,7 @@ mod tests {
     }
 
     #[test]
-    fn test_update() {
+    fn updating_tag_name_and_color_persists_changes() {
         with_service(|svc| {
             let tag = svc.create("old", None, None).unwrap();
             svc.update(&tag.id, "new", None, Some("#ff0000")).unwrap();
@@ -247,7 +247,7 @@ mod tests {
     }
 
     #[test]
-    fn test_delete() {
+    fn deleting_a_tag_removes_it_and_note_tags() {
         with_service(|svc| {
             let tag = svc.create("delete-me", None, None).unwrap();
             svc.delete(&tag.id).unwrap();
@@ -256,7 +256,7 @@ mod tests {
     }
 
     #[test]
-    fn test_list_roots() {
+    fn root_tags_have_no_parent() {
         with_service(|svc| {
             svc.create("root1", None, None).unwrap();
             svc.create("root2", None, None).unwrap();
@@ -268,7 +268,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_children() {
+    fn getting_children_of_a_parent_tag_works() {
         with_service(|svc| {
             let p = svc.create("parent", None, None).unwrap();
             svc.create("c1", Some(&p.id), None).unwrap();
@@ -279,7 +279,7 @@ mod tests {
     }
 
     #[test]
-    fn test_assign_and_get_tags_for_note() {
+    fn assigning_tag_to_note_and_listing_tags_works() {
         with_service(|svc| {
             let tag = svc.create("devops", None, None).unwrap();
             svc.assign_to_note(&tag.id, "note-1").unwrap();
@@ -290,7 +290,7 @@ mod tests {
     }
 
     #[test]
-    fn test_remove_from_note() {
+    fn removing_tag_from_note_clears_it() {
         with_service(|svc| {
             let tag = svc.create("temp", None, None).unwrap();
             svc.assign_to_note(&tag.id, "note-1").unwrap();
@@ -301,7 +301,7 @@ mod tests {
     }
 
     #[test]
-    fn test_empty_name_rejected() {
+    fn creating_tag_with_empty_name_is_rejected() {
         with_service(|svc| {
             let result = svc.create("", None, None);
             assert!(result.is_err());
@@ -309,7 +309,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_all() {
+    fn listing_all_tags_returns_every_tag() {
         with_service(|svc| {
             svc.create("a", None, None).unwrap();
             svc.create("b", None, None).unwrap();
