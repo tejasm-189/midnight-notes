@@ -14,7 +14,7 @@ All application source code. Organized by layer: UI (Dioxus components), Core (b
 
 | Folder | Status | Description |
 |--------|--------|-------------|
-| `ui/` | ✅ done | Dioxus frontend: workspace, settings (with sidebar), vault lock, editors, sidebar |
+| `ui/` | ✅ done | Dioxus frontend: workspace, settings (with sidebar), vault lock, editors, shared SidebarItem |
 | `core/` | ✅ done | Business logic: notes, tags, search, backlinks, history, export, markdown, plugins, watcher |
 | `storage/` | ✅ done | SQLite persistence: database, migrations, models, attachments |
 | `crypto/` | ✅ done | Encryption: Argon2id, XChaCha20-Poly1305, AES-256-GCM |

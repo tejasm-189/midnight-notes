@@ -21,7 +21,7 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 | Folder | Status | Description |
 |--------|--------|-------------|
 | `editor/` | ✅ done | Prose/Code/Vim editors, slash commands |
-| `sidebar/` | ✅ done | Backlinks panel, tag tree, calendar, smart views list |
+| `sidebar/` | ✅ done | Backlinks panel, tag tree, calendar, smart views list, shared SidebarItem component |
 
 ## Progress
 - [x] Root component with routing (VaultLock ↔ Workspace ↔ Settings)

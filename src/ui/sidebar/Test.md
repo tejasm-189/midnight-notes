@@ -1,7 +1,7 @@
 # Tests — src/ui/sidebar/
 
 ## Unit Tests
-Currently no unit tests for sidebar components. They are tested via integration workflows.
+Currently no unit tests for sidebar components (backlinks, tag_tree, smart_views, calendar). SidebarItem component is shared and used by both workspace and settings.
 
 ### Components without tests (needs coverage):
 - `backlinks.rs` — Linked mentions panel logic

@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::ui::app::SharedDb;
+use crate::ui::sidebar::SidebarItem;
 use crate::ui::theme::{use_theme_colors, use_theme_signal, Theme};
 
 #[component]
@@ -15,49 +16,28 @@ pub fn Settings(db: Option<SharedDb>, on_close: EventHandler<()>) -> Element {
     let db_dark = db.clone();
     let db_light = db.clone();
 
-    let sidebar_item = |icon: &str, label: &str, active: bool| {
-        let bg = if active {
-            c.bg_surface_high
-        } else {
-            "transparent"
-        };
-        let color = if active { c.accent } else { c.text_secondary };
-        let left = if active {
-            format!("2px solid {}", c.accent)
-        } else {
-            "2px solid transparent".to_string()
-        };
-        rsx! {
-            div { style: "display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: {bg}; color: {color}; border-left: {left}; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer;",
-                span { class: "material-symbols-outlined", style: "font-size: 18px;", "{icon}" }
-                span { "{label}" }
-            }
-        }
-    };
-
     rsx! {
         div { style: "display: flex; height: 100vh; background: {c.bg_primary};",
 
-            // Sidebar matching DESIGN.md
-            nav { style: "width: 256px; min-width: 256px; background: {c.bg_surface}; border-right: 1px solid {c.border}; display: flex; flex-direction: column; padding: 16px 0;",
+            // Sidebar matching workspace style + DESIGN.md
+            nav { style: "width: 256px; min-width: 256px; background: {c.bg_surface}; border-right: 1px solid {c.border}; display: flex; flex-direction: column; padding: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px;",
                 div { style: "padding: 0 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;",
-                    span { class: "material-symbols-outlined fill", style: "font-size: 28px; color: {c.accent};", "lock" }
+                    span { class: "material-symbols-outlined fill", style: "font-size: 28px; color: {c.accent};", "description" }
                     div { h1 { style: "font-family: Inter; font-size: 20px; font-weight: 600; color: {c.accent};", "Midnight Notes" } p { style: "font-size: 11px; color: {c.accent_green};", "Local-first Sync" } }
                 }
-                div { style: "flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 0 8px;",
-                    {sidebar_item("description", "All Notes", false)}
-                    {sidebar_item("auto_awesome", "Smart Views", false)}
+                div { style: "flex: 1; display: flex; flex-direction: column; padding: 0 8px;",
+                    SidebarItem { icon: "description", label: "All Notes", active: false, onclick: move |_| on_close.call(()) }
+                    SidebarItem { icon: "auto_awesome", label: "Smart Views", active: false, onclick: move |_| on_close.call(()) }
                     div { style: "height: 1px; background: {c.border}; margin: 8px 16px;" }
-                    {sidebar_item("archive", "Archived", false)}
-                    {sidebar_item("delete", "Trash", false)}
-                    {sidebar_item("settings", "Settings", true)}
+                    SidebarItem { icon: "archive", label: "Archived", active: false, onclick: move |_| on_close.call(()) }
+                    SidebarItem { icon: "delete", label: "Trash", active: false, onclick: move |_| on_close.call(()) }
+                    SidebarItem { icon: "settings", label: "Settings", active: true, onclick: move |_| {} }
+                    SidebarItem { icon: "lock", label: "Encrypted", active: false, onclick: move |_| on_close.call(()) }
                 }
                 div { style: "border-top: 1px solid {c.border}; padding: 8px;",
-                    div { style: "display: flex; align-items: center; gap: 12px; padding: 8px 16px; color: {c.text_secondary}; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer;",
-                        onclick: move |_| on_close.call(()),
-                        span { class: "material-symbols-outlined", style: "font-size: 18px;", "arrow_back" }
-                        span { "Back to Workspace" }
-                    }
+                    SidebarItem { icon: "help", label: "Help", active: false, onclick: move |_| {} }
+                    SidebarItem { icon: "sensors", label: "Status", active: false, onclick: move |_| {} }
+                    SidebarItem { icon: "arrow_back", label: "Back to Workspace", active: false, onclick: move |_| on_close.call(()) }
                 }
             }
 
@@ -67,7 +47,6 @@ pub fn Settings(db: Option<SharedDb>, on_close: EventHandler<()>) -> Element {
                     h2 { style: "font-family: Inter; font-size: 28px; font-weight: 700; color: {c.text_primary}; letter-spacing: -0.02em; margin-bottom: 4px;", "Settings & Security" }
                     p { style: "font-family: Inter; font-size: 14px; color: {c.text_secondary}; margin-bottom: 40px;", "Manage your encryption keys, appearance, and sync preferences." }
 
-                    // Theme section
                     section { style: "margin-bottom: 48px;",
                         h3 { style: "font-family: Inter; font-size: 20px; font-weight: 600; color: {c.text_primary}; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid {c.border}; padding-bottom: 8px;",
                             span { class: "material-symbols-outlined", style: "font-size: 20px; color: {c.accent};", "palette" } "Appearance"
@@ -80,8 +59,7 @@ pub fn Settings(db: Option<SharedDb>, on_close: EventHandler<()>) -> Element {
                         }
                     }
 
-                    // About
-                    section { style: "margin-bottom: 48px;",
+                    section {
                         h3 { style: "font-family: Inter; font-size: 20px; font-weight: 600; color: {c.text_primary}; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid {c.border}; padding-bottom: 8px;",
                             span { class: "material-symbols-outlined", style: "font-size: 20px; color: {c.accent};", "info" } "About"
                         }
@@ -93,10 +71,11 @@ pub fn Settings(db: Option<SharedDb>, on_close: EventHandler<()>) -> Element {
                 }
             }
 
-            // Footer
             div { style: "position: fixed; bottom: 0; left: 256px; right: 0; height: 28px; background: {c.bg_canvas}; border-top: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px;",
-                span { style: "font-weight: 700; color: {c.accent};", "End-to-End Encrypted" }
-                div { style: "display: flex; gap: 16px; color: {c.text_muted};", span { "v0.1.0" } }
+                span { style: "font-weight: 700; color: {c.accent}; display: flex; align-items: center; gap: 4px;",
+                    span { class: "material-symbols-outlined fill", style: "font-size: 12px; color: {c.accent_green};", "lock" } "End-to-End Encrypted"
+                }
+                span { style: "color: {c.text_muted};", "v0.1.0" }
             }
         }
     }

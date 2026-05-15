@@ -7,7 +7,7 @@ Sidebar panels: backlinks, tag tree, calendar, smart views list.
 
 | File | Status | Description |
 |------|--------|-------------|
-| `mod.rs` | ✅ done | Module root |
+| `mod.rs` | ✅ done | Module root, shared SidebarItem component |
 | `backlinks.rs` | ✅ done | Linked mentions panel for selected note, clickable |
 | `tag_tree.rs` | ✅ done | Nested tag tree, clickable to search by tag |
 | `smart_views.rs` | ✅ done | Saved FTS5 smart views list |
