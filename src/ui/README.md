@@ -11,25 +11,27 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 | `app.rs` | ✅ done | Root component with screen routing (VaultLock / Workspace) |
 | `vault_lock.rs` | ✅ done | Vault unlock screen (biometric + master password) |
 | `workspace.rs` | ✅ done | Main workspace (sidebar, note list, editor with mode switcher) |
-| `viewer.rs` | 📋 planned | Note viewer/reader |
-| `search.rs` | 📋 planned | Search bar + results display |
+| `viewer.rs` | ✅ done | Read-only note viewer with markdown rendering |
+| `smart_view.rs` | ✅ done | Smart Views screen: FTS5 search, results grid, linked graph |
 | `settings.rs` | ✅ done | Settings panel with theme switcher (Midnight/Dark/Light) |
-| `theme.rs` | ✅ done | Theme provider system, CSS custom properties, 3 themes |
+| `theme.rs` | ✅ done | Theme provider system, ThemeColors struct, 3 themes |
 
 ## Sub-folders
 
 | Folder | Status | Description |
 |--------|--------|-------------|
-| `editor/` | ✅ done | Multi-mode editor components |
-| `sidebar/` | 📋 planned | Navigation sidebar components |
+| `editor/` | ✅ done | Prose/Code/Vim editors, slash commands |
+| `sidebar/` | ✅ done | Backlinks panel, tag tree, calendar, smart views list |
 
 ## Progress
 - [x] Root component with routing (VaultLock ↔ Workspace ↔ Settings)
-- [x] Vault lock screen
-- [x] Main workspace shell
-- [x] Settings screen with theme selector
-- [x] Theme system: 3 themes (Midnight/Dark/Light) via CSS custom properties
-- [ ] Search/Smart Views screen
+- [x] Vault lock screen with biometric + password
+- [x] Workspace: sidebar, note list, editor, auto-save, tags, history
+- [x] Smart Views: FTS5 search, results grid, linked graph panel
+- [x] Settings: theme selector (Midnight/Dark/Light)
+- [x] Theme system: 3 themes, ThemeColors struct for Rust-level theme
+- [x] Calendar sidebar: date picker month grid, daily notes
+- [x] Backlinks panel, tag tree, smart views list in sidebar
 
 ## Notes
 - Follow the Midnight design system in `DESIGN.md`

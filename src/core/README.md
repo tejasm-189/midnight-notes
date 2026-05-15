@@ -24,8 +24,8 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 | `plugin/` | ✅ done | WASM plugin host (wasmtime), manager, API types |
 
 ## Progress
-- [x] Note CRUD (create, read, update, delete, trash, toggle_pin, toggle_archive)
-- [x] FTS5 search
+- [x] Note CRUD with XChaCha20-Poly1305 encryption
+- [x] FTS5 search with tag:/has:todo/path: filters
 - [x] Tag CRUD + tree (nested parent/child)
 - [x] Note-tag assignment
 - [x] [[Wiki-link]] backlink extraction + resolution
@@ -34,7 +34,8 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 - [x] Version history (list, get, restore, diff)
 - [x] Encrypted zip export/import with salt in metadata
 - [x] WASM plugin host + manager + file watcher
-- [x] Unit tests (97 tests)
+- [x] Unit tests: 97 unit + 9 integration + 2 doc = 108
+- [x] Encryption: Argon2id key derivation, XChaCha20-Poly1305 encrypt/decrypt
 
 ## Notes
 - Must not import Dioxus or Tauri types

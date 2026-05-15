@@ -228,6 +228,11 @@ cargo tauri build
 | 6 | WASM plugin system, file watching (notify), biometric lock | ✅ Done |
 | 7 | Theming (light/dark/midnight), settings UI, polish | ✅ Done |
 | 8 | CI pipeline (GitHub Actions), release profile, cross-compile config | ✅ Done |
+| 9 | Backend integration: auto-save, tags UI, history UI, export/import | ✅ Done |
+| 10 | Smart Views screen, search results, linked graph panel | ✅ Done |
+| 11 | Calendar sidebar: date picker, daily notes per date | ✅ Done |
+| 12 | XChaCha20-Poly1305 note content encryption | ✅ Done |
+| 13 | Polish: tag tree refresh, note card tags, UI fixes | ✅ Done |
 
 ## Security Model
 
