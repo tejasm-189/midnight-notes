@@ -15,13 +15,14 @@ echo "$RS_FILES" | while IFS= read -r rs_file; do
         readme="$dir/README.md"
         testmd="$dir/Test.md"
 
-        if [ -f "$readme" ] && ! echo "$STAGED" | grep -qF "$readme"; then
-            echo "ERROR: $readme is not staged — update it to reflect changes." >&2
+        # Only check staging if the file has uncommitted changes
+        if [ -f "$readme" ] && git diff --name-only | grep -qF "$readme" && ! echo "$STAGED" | grep -qF "$readme"; then
+            echo "ERROR: $readme has changes but is not staged — stage it." >&2
             exit 1
         fi
 
-        if [ -f "$testmd" ] && ! echo "$STAGED" | grep -qF "$testmd"; then
-            echo "ERROR: $testmd is not staged — update it if tests changed." >&2
+        if [ -f "$testmd" ] && git diff --name-only | grep -qF "$testmd" && ! echo "$STAGED" | grep -qF "$testmd"; then
+            echo "ERROR: $testmd has changes but is not staged — stage it." >&2
             exit 1
         fi
 

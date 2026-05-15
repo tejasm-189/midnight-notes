@@ -169,9 +169,13 @@ pub fn Workspace(
                                 selected_id.set(Some(note.id.clone())); title.set(note.title); content.set(note.content);
                                 if let Ok(tags) = TagService::new(d).get_tags_for_note(&note.id) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); }
                                 if let Ok(h) = HistoryService::new(d).list(&note.id) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); }
-                            } else if let Ok(note) = note_svc.create(&today, "") {
-                                title.set(note.title.clone()); content.set(note.content.clone()); selected_id.set(Some(note.id.clone()));
-                                notes.write().insert(0, note);
+                            } else {
+                                let date_fmt = chrono::Utc::now().format("%a %d %b %Y").to_string();
+                                let template = format!("# Daily Note — {}\n\n## Tasks\n- [ ] \n\n## Notes\n\n## Meetings\n\n", date_fmt);
+                                if let Ok(note) = note_svc.create(&today, &template) {
+                                    title.set(note.title.clone()); content.set(note.content.clone()); selected_id.set(Some(note.id.clone()));
+                                    notes.write().insert(0, note);
+                                }
                             }
                         }
                     } }
@@ -238,9 +242,14 @@ pub fn Workspace(
                                         selected_id.set(Some(note.id.clone())); title.set(note.title); content.set(note.content);
                                         if let Ok(tags) = TagService::new(d).get_tags_for_note(&note.id) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); }
                                         if let Ok(h) = HistoryService::new(d).list(&note.id) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); }
-                                    } else if let Ok(note) = svc.create(&date_str, "") {
-                                        selected_id.set(Some(note.id.clone())); title.set(note.title.clone()); content.set(note.content.clone());
-                                        notes.write().insert(0, note);
+                                    } else {
+                                        let parsed = chrono::NaiveDate::parse_from_str(&date_str, "%Y-%m-%d").ok();
+                                        let date_fmt = parsed.map(|d| d.format("%a %d %b %Y").to_string()).unwrap_or_else(|| date_str.clone());
+                                        let template = format!("# Daily Note — {}\n\n## Tasks\n- [ ] \n\n## Notes\n\n## Meetings\n\n", date_fmt);
+                                        if let Ok(note) = svc.create(&date_str, &template) {
+                                            selected_id.set(Some(note.id.clone())); title.set(note.title.clone()); content.set(note.content.clone());
+                                            notes.write().insert(0, note);
+                                        }
                                     }
                                 }
                             },
@@ -430,10 +439,7 @@ pub fn Workspace(
                                             })}
                                         }
                                     }
-                                    input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
-                                        placeholder: "Untitled",
-                                        style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
-                                    }
+                                    // Trash notification
                                     if view.read().clone() == View::Trash {
                                         div { style: "padding: 12px; background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; margin-bottom: 16px; display: flex; gap: 8px; align-items: center;",
                                             span { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; flex: 1;", "This note is in the Trash." }
@@ -447,8 +453,35 @@ pub fn Workspace(
                                             }
                                         }
                                     }
-                                    textarea { value: "{content}", oninput: move |e| content.set(e.value()),
-                                        style: "width: 100%; min-height: 60vh; background: transparent; border: none; color: {c.text_primary}; font-family: Inter; font-size: 16px; line-height: 1.7; resize: none; outline: none;",
+                                    // Mode-aware editor
+                                    if mode() == "Prose" {
+                                        crate::ui::editor::prose::ProseEditor {
+                                            content: content.read().clone(),
+                                            oninput: move |c| content.set(c),
+                                            title: title.read().clone(),
+                                            ontitleinput: move |t| title.set(t),
+                                        }
+                                    } else if mode() == "Code" {
+                                        crate::ui::editor::code::CodeEditor {
+                                            content: content.read().clone(),
+                                            oninput: move |c| content.set(c),
+                                            title: title.read().clone(),
+                                            ontitleinput: move |t| title.set(t),
+                                        }
+                                    } else {
+                                        // Vim mode: title input + textarea + status bar
+                                        input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
+                                            placeholder: "Untitled",
+                                            style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                                        }
+                                        textarea { value: "{content}", oninput: move |e| content.set(e.value()),
+                                            spellcheck: false,
+                                            style: "width: 100%; min-height: 60vh; background: transparent; border: none; color: {c.text_primary}; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; resize: none; outline: none; tab-size: 2;",
+                                        }
+                                        div { style: "padding: 4px 8px; background: {c.bg_canvas}; border-top: 1px solid {c.border}; display: flex; font-size: 11px; font-family: 'JetBrains Mono', monospace;",
+                                            span { style: "color: {c.accent_green}; font-weight: 700;", "INSERT" }
+                                            span { style: "color: {c.text_muted}; margin-left: 8px;", "-- INSERT --" }
+                                        }
                                     }
                                 }
                             }
