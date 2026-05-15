@@ -3,23 +3,33 @@ set -e
 
 echo "=== Pre-commit Hook ==="
 
-# Get staged files (handle empty case)
 STAGED=$(git diff --cached --name-only 2>/dev/null || true)
 
-# For each staged .rs file, ensure its directory's README.md is also handled
+# For each staged .rs file, check README.md + Test.md
 echo "$STAGED" | grep '\.rs$' 2>/dev/null || true | while IFS= read -r rs_file; do
     [ -z "$rs_file" ] && continue
     dir=$(dirname "$rs_file")
     readme="$dir/README.md"
+    testmd="$dir/Test.md"
 
+    # Check README.md exists
     if [ ! -f "$readme" ]; then
         echo "ERROR: $readme missing — every directory with .rs files must have a README.md" >&2
         exit 1
     fi
 
+    # Check Test.md exists
+    if [ ! -f "$testmd" ]; then
+        echo "ERROR: $testmd missing — every directory with .rs files must have a Test.md" >&2
+        exit 1
+    fi
+
+    # Warn if not staged
     if ! echo "$STAGED" | grep -qF "$readme"; then
-        echo "WARNING: $readme is not staged" >&2
-        echo "       You modified $rs_file — update $readme to reflect changes." >&2
+        echo "WARNING: $readme is not staged — update it to reflect changes." >&2
+    fi
+    if ! echo "$STAGED" | grep -qF "$testmd"; then
+        echo "WARNING: $testmd is not staged — update it if you added/removed tests." >&2
     fi
 done
 
