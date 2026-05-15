@@ -322,7 +322,7 @@ pub fn Workspace(
                         }
                     }
                 }
-            } else {
+            } else if view.read().clone() == View::SmartViews {
                 crate::ui::smart_view::SmartViewPanel { db: db.clone(), on_select: move |note_id: String| {
                     if let Some(ref d) = db_smart { if let Ok(Some(n)) = NoteService::new(d).get(&note_id) {
                         view.set(View::AllNotes); selected_id.set(Some(note_id.clone())); title.set(n.title); content.set(n.content);

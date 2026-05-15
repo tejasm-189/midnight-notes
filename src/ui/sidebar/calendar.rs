@@ -12,6 +12,7 @@ pub fn CalendarPanel(
     let today = Utc::now().date_naive();
     let mut view_year = use_signal(|| today.year());
     let mut view_month = use_signal(|| today.month());
+    let mut selected_date = use_signal(String::new);
 
     // Compute calendar grid
     let first_day = NaiveDate::from_ymd_opt(*view_year.read(), *view_month.read(), 1).unwrap();
@@ -93,17 +94,18 @@ pub fn CalendarPanel(
                 {(1..=days_in_month).map(|day| {
                     let is_today = today.year() == *view_year.read() && today.month() == *view_month.read() && today.day() == day;
                     let date_str = format!("{:04}-{:02}-{:02}", *view_year.read(), *view_month.read(), day);
+                    let is_selected = *selected_date.read() == date_str;
                     let has_notes = note_dates.contains(&date_str);
-                    let bg = if is_today { c.accent } else { "transparent" };
-                    let color = if is_today { c.bg_primary } else { c.text_secondary };
-                    let dot = if has_notes && !is_today { c.accent_green } else { "transparent" };
+                    let bg = if is_today { c.accent } else if is_selected { c.accent_green } else { "transparent" };
+                    let color = if is_today || is_selected { c.bg_primary } else { c.text_secondary };
+                    let dot = if has_notes && !is_today && !is_selected { c.accent_green } else { "transparent" };
                     rsx! {
                         div {
                             key: "{day}",
                             style: "padding: 3px 0; text-align: center; font-size: 10px; font-family: 'JetBrains Mono', monospace; background: {bg}; color: {color}; border-radius: 2px; cursor: pointer; position: relative;",
-                            onclick: move |_| on_select_date.call(date_str.clone()),
+                            onclick: move |_| { selected_date.set(date_str.clone()); on_select_date.call(date_str.clone()); },
                             span { "{day}" }
-                            if has_notes && !is_today {
+                            if has_notes && !is_selected && !is_today {
                                 div { style: "position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; background: {dot};" }
                             }
                         }
@@ -113,7 +115,7 @@ pub fn CalendarPanel(
 
             // Today button
             button { style: "width: 100%; margin-top: 8px; background: none; border: 1px solid {c.border}; color: {c.accent}; font-size: 10px; font-family: 'JetBrains Mono', monospace; padding: 4px; border-radius: 2px; cursor: pointer;",
-                onclick: move |_| { view_year.set(today.year()); view_month.set(today.month()); on_select_date.call(today.format("%Y-%m-%d").to_string()); },
+                onclick: move |_| { let d = today.format("%Y-%m-%d").to_string(); view_year.set(today.year()); view_month.set(today.month()); selected_date.set(d.clone()); on_select_date.call(d); },
                 "Today: {today.format(\"%b %d, %Y\")}"
             }
         }
