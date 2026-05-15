@@ -51,6 +51,7 @@ uuid = { version = "1", features = ["v4", "serde"] }
 thiserror = "2"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1", features = ["time"] }
 hex = "0.4"
 base64 = "0.22"
 zip = "2"

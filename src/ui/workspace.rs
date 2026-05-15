@@ -1,6 +1,9 @@
-use chrono::Utc;
+#![allow(clippy::possible_missing_else)]
 use dioxus::prelude::*;
+use std::time::Duration;
 
+use crate::core::export::ExportService;
+use crate::core::history::HistoryService;
 use crate::core::note::NoteService;
 use crate::core::search::SearchService;
 use crate::core::tag::TagService;
@@ -31,8 +34,12 @@ pub fn Workspace(
     let mut content = use_signal(String::new);
     let mut query = use_signal(String::new);
     let mut note_tags = use_signal(Vec::<String>::new);
+    let mut all_tags = use_signal(Vec::<(String, String)>::new); // (id, name)
+    let mut snapshots = use_signal(Vec::<(String, String)>::new); // (id, created_at)
+    let mut show_snapshots = use_signal(|| false);
+    let mut tag_input = use_signal(String::new);
 
-    // Pre-clone db for each closure that needs it
+    // Pre-clone db for each closure
     let db_effect = db.clone();
     let db_smart = db.clone();
     let db_new = db.clone();
@@ -50,12 +57,44 @@ pub fn Workspace(
     let db_save_r = db.clone();
     let db_restore_r = db.clone();
     let db_del_r = db.clone();
+    let db_auto = db.clone();
+    let db_tag = db.clone();
+    let db_hist = db.clone();
+    let db_tag2 = db.clone();
+    let db_tag3 = db.clone();
+    let db_export = db.clone();
+    let db_import = db.clone();
 
     use_effect(move || {
         refresh_notes(&db_effect, &view.read(), &notes, &query.read());
     });
 
+    // Auto-save: debounced 2s after content/title changes
+    let db_as = db_auto.clone();
+    let sel_as = selected_id;
+    let t_as = title;
+    let c_as = content;
+    use_effect(move || {
+        let _t = t_as.read().clone();
+        let _c = c_as.read().clone();
+        let id = sel_as.read().clone();
+        if id.is_none() {
+            return;
+        }
+        let d2 = db_as.clone();
+        let t2 = _t;
+        let c2 = _c;
+        let id2 = id.unwrap();
+        spawn(async move {
+            tokio::time::sleep(Duration::from_secs(2)).await;
+            if let Some(ref d) = d2 {
+                let _ = NoteService::new(d).update(&id2, &t2, &c2);
+            }
+        });
+    });
+
     let fmt_date = |note: &Note| -> String {
+        use chrono::Utc;
         let diff = Utc::now() - note.updated_at;
         if diff.num_minutes() < 1 {
             "Just now".into()
@@ -73,58 +112,67 @@ pub fn Workspace(
     rsx! {
         div { style: "display: flex; height: 100vh; background: {c.bg_primary};",
 
+            // ====== SIDEBAR ======
             nav { style: "width: 256px; min-width: 256px; border-right: 1px solid {c.border}; background: {c.bg_surface}; display: flex; flex-direction: column; padding: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px;",
                 div { style: "padding: 0 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;",
                     span { class: "material-symbols-outlined fill", style: "font-size: 28px; color: {c.accent};", "description" }
                     div { h1 { style: "font-family: Inter; font-size: 20px; font-weight: 600; color: {c.accent};", "Midnight Notes" } p { style: "font-size: 11px; color: {c.accent_green};", "Local-first Sync" } }
                 }
                 button { style: "margin: 0 16px 16px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;",
-                    onclick: move |_| { if let Some(ref d) = db_new { if let Ok(n) = NoteService::new(d).create("Untitled", "") { title.set(n.title.clone()); content.set(n.content.clone()); selected_id.set(Some(n.id.clone())); notes.write().insert(0, n); note_tags.set(vec![]); } } },
+                    onclick: move |_| { if let Some(ref d) = db_new { if let Ok(n) = NoteService::new(d).create("Untitled", "") { title.set(n.title.clone()); content.set(n.content.clone()); selected_id.set(Some(n.id.clone())); notes.write().insert(0, n); note_tags.set(vec![]); all_tags.set(vec![]); } } },
                     span { class: "material-symbols-outlined", style: "font-size: 16px;", "add" } "New Note"
                 }
                 div { style: "flex: 1; overflow-y: auto;",
-                    SidebarItem { icon: "description", label: "All Notes", active: matches!(*view.read(), View::AllNotes),
-                        onclick: move |_| { view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
-                    SidebarItem { icon: "auto_awesome", label: "Smart Views", active: matches!(*view.read(), View::SmartViews),
-                        onclick: move |_| view.set(View::SmartViews) }
+                    SidebarItem { icon: "description", label: "All Notes", active: matches!(*view.read(), View::AllNotes), onclick: move |_| { view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
+                    SidebarItem { icon: "auto_awesome", label: "Smart Views", active: matches!(*view.read(), View::SmartViews), onclick: move |_| view.set(View::SmartViews) }
                     div { style: "height: 1px; background: {c.border}; margin: 8px 16px;" }
-                    SidebarItem { icon: "archive", label: "Archived", active: matches!(*view.read(), View::Archived),
-                        onclick: move |_| { view.set(View::Archived); refresh_notes(&db_side_arch, &View::Archived, &notes, ""); } }
-                    SidebarItem { icon: "delete", label: "Trash", active: matches!(*view.read(), View::Trash),
-                        onclick: move |_| { view.set(View::Trash); refresh_notes(&db_side_trash, &View::Trash, &notes, ""); } }
-                    if !note_tags.read().is_empty() {
-                        div { style: "padding: 8px 16px 4px; font-size: 10px; color: {c.text_muted}; text-transform: uppercase; letter-spacing: 0.08em;", "Tags" }
-                        {note_tags.read().iter().map(|t| rsx! {
-                            div { key: "{t}", style: "display: flex; align-items: center; gap: 8px; padding: 4px 16px; font-size: 11px; color: {c.text_secondary};",
-                                span { class: "material-symbols-outlined", style: "font-size: 14px; color: {c.accent};", "tag" } span { "{t}" }
+                    SidebarItem { icon: "archive", label: "Archived", active: matches!(*view.read(), View::Archived), onclick: move |_| { view.set(View::Archived); refresh_notes(&db_side_arch, &View::Archived, &notes, ""); } }
+                    SidebarItem { icon: "delete", label: "Trash", active: matches!(*view.read(), View::Trash), onclick: move |_| { view.set(View::Trash); refresh_notes(&db_side_trash, &View::Trash, &notes, ""); } }
+
+                    // Tags section
+                    if !note_tags.read().is_empty() || selected_id.read().is_some() {
+                        div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
+                        div { style: "padding: 4px 16px; font-size: 10px; color: {c.text_muted}; text-transform: uppercase; letter-spacing: 0.08em; display: flex; justify-content: space-between; align-items: center;",
+                            span { "Tags" }
+                            button { style: "background: none; border: none; color: {c.accent}; cursor: pointer; font-size: 14px; padding: 0;",
+                                onclick: move |_| { if let Some(ref d) = db_tag { if let Some(ref nid) = *selected_id.read() { let t = tag_input.read().clone(); if !t.is_empty() { if let Ok(Some(tag)) = TagService::new(d).get_by_name(&t) { let _ = TagService::new(d).assign_to_note(&tag.id, nid); } else if let Ok(new_tag) = TagService::new(d).create(&t, None, None) { let _ = TagService::new(d).assign_to_note(&new_tag.id, nid); } tag_input.set(String::new()); if let Ok(tags) = TagService::new(d).get_tags_for_note(nid) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); } if let Ok(h) = HistoryService::new(d).list(nid) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); } } } } },
+                                "+"
+                            }
+                        }
+                        input { r#type: "text", placeholder: "Add tag...", value: "{tag_input}",
+                            oninput: move |e| tag_input.set(e.value()),
+                            style: "width: calc(100% - 32px); margin: 0 16px 4px; background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 2px; padding: 4px 6px; color: {c.text_primary}; font-size: 11px; outline: none;",
+                        }
+                        {note_tags.read().iter().map(|t| {
+                            let tn = t.clone();
+                            let db_rm = db_tag.clone();
+                            let sid = selected_id;
+                            rsx! {
+                                div { key: "{t}", style: "display: flex; align-items: center; gap: 4px; padding: 2px 16px; font-size: 11px; color: {c.text_secondary};",
+                                    span { class: "material-symbols-outlined", style: "font-size: 14px; color: {c.accent};", "tag" }
+                                    span { style: "flex: 1;", "{t}" }
+                                    button { style: "background: none; border: none; color: {c.text_muted}; cursor: pointer; font-size: 12px; padding: 0;",
+                                        onclick: move |_| { if let Some(ref d) = db_rm { if let Some(ref nid) = *sid.read() { if let Ok(Some(tag)) = TagService::new(d).get_by_name(&tn) { let _ = TagService::new(d).remove_from_note(&tag.id, nid); } if let Ok(tags) = TagService::new(d).get_tags_for_note(nid) { note_tags.set(tags.iter().map(|t| t.name.clone()).collect()); } } } },
+                                        "✕"
+                                    }
+                                }
                             }
                         })}
                     }
                 }
+
+                // Bottom: export/import + lock
                 div { style: "border-top: 1px solid {c.border}; padding: 8px;",
+                    SidebarItem { icon: "file_download", label: "Export", active: false, onclick: move |_| { if let Some(ref d) = db_export { let ids: Vec<String> = notes.read().iter().map(|n| n.id.clone()).collect(); let ids_ref: Vec<&str> = ids.iter().map(|s| s.as_str()).collect(); let path = std::path::Path::new("midnight-export.zip"); let _ = ExportService::new(d).export_notes(&ids_ref, path, "export-pass"); } } }
+                    SidebarItem { icon: "file_upload", label: "Import", active: false, onclick: move |_| { let path = std::path::Path::new("midnight-export.zip"); if path.exists() { if let Some(ref d) = db_import { let _ = ExportService::new(d).import_notes(path, "export-pass"); let mut n = notes; n.write().clone_from(&vec![]); refresh_notes(&db_import, &View::AllNotes, &notes, ""); } } } }
+                    div { style: "height: 1px; background: {c.border}; margin: 4px 0;" }
                     SidebarItem { icon: "settings", label: "Settings", active: false, onclick: move |_| on_open_settings.call(()) }
                     SidebarItem { icon: "lock", label: "Lock Vault", active: false, onclick: move |_| on_lock.call(()) }
                 }
             }
 
-            if *view.read() == View::SmartViews {
-                crate::ui::smart_view::SmartViewPanel {
-                    db: db.clone(),
-                    on_select: move |note_id: String| {
-                        if let Some(ref d) = db_smart {
-                            if let Ok(Some(n)) = NoteService::new(d).get(&note_id) {
-                                view.set(View::AllNotes);
-                                selected_id.set(Some(note_id.clone()));
-                                title.set(n.title);
-                                content.set(n.content);
-                                if let Ok(tags) = TagService::new(d).get_tags_for_note(&note_id) {
-                                    note_tags.set(tags.iter().map(|t| t.name.clone()).collect());
-                                }
-                            }
-                        }
-                    },
-                }
-            } else {
+            // ====== NOTE LIST ======
+            if *view.read() != View::SmartViews {
                 aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
                     div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
                         div { style: "position: relative;",
@@ -142,13 +190,14 @@ pub fn Workspace(
                             let tc = if act { c.accent } else { c.text_primary };
                             let nid1 = note.id.clone(); let nid2 = note.id.clone();
                             let dc1 = di.clone(); let dc2 = di.clone();
+                            let dt = db_tag2.clone();
                             let v = *view.read();
                             rsx! {
                                 div { key: "{note.id}", style: "padding: 14px 16px; border-bottom: 1px solid {c.border}; background: {bg}; cursor: pointer; position: relative;",
                                     onclick: move |_| {
                                         if let Some(ref d) = dc1 { if let Ok(Some(n)) = NoteService::new(d).get(&nid1) {
                                             selected_id.set(Some(nid1.clone())); title.set(n.title); content.set(n.content);
-                                            if let Ok(tags) = TagService::new(d).get_tags_for_note(&nid1) { note_tags.set(tags.iter().map(|t| t.name.clone()).collect()); }
+                                            if let Some(ref d) = dt { if let Ok(tags) = TagService::new(d).get_tags_for_note(&nid1) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); } if let Ok(h) = HistoryService::new(d).list(&nid1) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); } }
                                         }}
                                     },
                                     if act { div { style: "position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: {c.accent};" } }
@@ -162,7 +211,7 @@ pub fn Workspace(
                                     div { style: "display: flex; justify-content: space-between; align-items: center;",
                                         span { style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {c.text_secondary};", "{fmt_date(note)}" }
                                         if v == View::Trash {
-                                            button { style: "font-family: 'JetBrains Mono', monospace; font-size: 10px; color: {c.error}; background: none; border: none; cursor: pointer; padding: 2px 4px;",
+                                            button { style: "font-family: 'JetBrains Mono', monospace; font-size: 10px; color: {c.error}; background: none; border: none; cursor: pointer;",
                                                 onclick: move |_| { if let Some(ref d) = dc2 { let _ = NoteService::new(d).delete_permanently(&nid2); let mut n = notes; n.write().retain(|x| x.id != nid2); } },
                                                 "Delete permanently"
                                             }
@@ -176,7 +225,17 @@ pub fn Workspace(
                         }
                     }
                 }
+            } else {
+                crate::ui::smart_view::SmartViewPanel { db: db.clone(), on_select: move |note_id: String| {
+                    if let Some(ref d) = db_smart { if let Ok(Some(n)) = NoteService::new(d).get(&note_id) {
+                        view.set(View::AllNotes); selected_id.set(Some(note_id.clone())); title.set(n.title); content.set(n.content);
+                        if let Some(ref d) = db_tag3 { if let Ok(tags) = TagService::new(d).get_tags_for_note(&note_id) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); } if let Ok(h) = HistoryService::new(d).list(&note_id) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); } }
+                    }}
+                }}
+            }
 
+            // ====== EDITOR ======
+            if *view.read() != View::SmartViews {
                 section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
                     header { style: "height: 56px; background: {c.bg_canvas}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;",
                         div { style: "display: flex; background: {c.bg_surface}; border-radius: 4px; border: 1px solid {c.border}; padding: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px;",
@@ -196,6 +255,11 @@ pub fn Workspace(
                                 onclick: move |_| { if let Some(ref d) = db_arch { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_archive(&id); selected_id.set(None); title.set(String::new()); content.set(String::new()); refresh_notes(&db_arch_r, &view.read(), &notes, ""); } } },
                                 span { class: "material-symbols-outlined", style: "font-size: 18px;", "archive" }
                             }
+                            // History button
+                            button { style: "color: {c.text_secondary}; background: none; border: none; padding: 4px; cursor: pointer;",
+                                onclick: move |_| { let cur = *show_snapshots.read(); show_snapshots.set(!cur); },
+                                span { class: "material-symbols-outlined", style: "font-size: 18px;", "history" }
+                            }
                             button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer;",
                                 onclick: move |_| { if let Some(ref d) = db_save { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).update(&id, &title.read(), &content.read()); refresh_notes(&db_save_r, &view.read(), &notes, ""); } } },
                                 "Save"
@@ -210,6 +274,26 @@ pub fn Workspace(
                                     { (1..=30).map(|i| rsx! { span { "{i}" } }) }
                                 }
                                 div { style: "padding-left: 48px;",
+                                    // Version history panel
+                                    if *show_snapshots.read() {
+                                        div { style: "background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; padding: 12px; margin-bottom: 16px;",
+                                            h4 { style: "font-family: Inter; font-size: 14px; font-weight: 600; color: {c.text_primary}; margin-bottom: 8px;", "Version History" }
+                                            if snapshots.read().is_empty() { p { style: "font-size: 12px; color: {c.text_muted};", "No previous versions" } }
+                                            {snapshots.read().iter().map(|(hid, date)| {
+                                                let h = hid.clone();
+                                                let db_h = db_hist.clone();
+                                                rsx! {
+                                                    div { key: "{hid}", style: "display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid {c.border};",
+                                                        span { style: "font-size: 12px; color: {c.text_secondary}; font-family: 'JetBrains Mono', monospace;", "{date}" }
+                                                        button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 2px; padding: 2px 8px; font-size: 10px; cursor: pointer;",
+                                                            onclick: move |_| { if let Some(ref d) = db_h { if let Ok(n) = HistoryService::new(d).restore(&h) { title.set(n.title); content.set(n.content); show_snapshots.set(false); } } },
+                                                            "Restore"
+                                                        }
+                                                    }
+                                                }
+                                            })}
+                                        }
+                                    }
                                     input { r#type: "text", value: "{title}", oninput: move |e| title.set(e.value()),
                                         style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
                                     }
@@ -295,13 +379,13 @@ fn SidebarItem(icon: String, label: String, active: bool, onclick: EventHandler<
         "transparent"
     };
     let color = if active { c.accent } else { c.text_secondary };
-    let left_border = if active {
+    let left = if active {
         format!("2px solid {}", c.accent)
     } else {
         "2px solid transparent".to_string()
     };
     rsx! {
-        a { style: "display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: {bg}; color: {color}; border-left: {left_border}; cursor: pointer; font-size: 11px;",
+        a { style: "display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: {bg}; color: {color}; border-left: {left}; cursor: pointer; font-size: 11px;",
             onclick: move |_| onclick.call(()),
             span { class: "material-symbols-outlined", style: "font-size: 18px;", "{icon}" }
             span { "{label}" }
