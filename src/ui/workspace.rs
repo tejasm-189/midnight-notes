@@ -139,17 +139,25 @@ pub fn Workspace(
 
     let fmt_date = |note: &Note| -> String {
         use chrono::Utc;
-        let diff = Utc::now() - note.updated_at;
+        let now = Utc::now();
+        let diff = now - note.updated_at;
+        let is_yesterday = (now.date_naive() - note.updated_at.date_naive()).num_days() == 1;
         if diff.num_minutes() < 1 {
             "Just now".into()
         } else if diff.num_hours() < 1 {
             format!("{}m ago", diff.num_minutes())
+        } else if is_yesterday {
+            format!("Yesterday, {}", note.updated_at.format("%H:%M"))
         } else if diff.num_days() < 1 {
             format!("{}h ago", diff.num_hours())
+        } else if diff.num_days() == 1 {
+            "Yesterday".into()
         } else if diff.num_days() < 7 {
             format!("{}d ago", diff.num_days())
-        } else {
+        } else if diff.num_days() < 365 {
             note.updated_at.format("%b %d").to_string()
+        } else {
+            note.updated_at.format("%b %d, %Y").to_string()
         }
     };
 
