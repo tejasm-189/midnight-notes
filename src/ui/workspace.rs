@@ -42,6 +42,7 @@ pub fn Workspace(
     // Pre-clone db for each closure
     let db_effect = db.clone();
     let db_smart = db.clone();
+    let db_smart2 = db.clone();
     let db_new = db.clone();
     let db_pin = db.clone();
     let db_arch = db.clone();
@@ -62,6 +63,8 @@ pub fn Workspace(
     let db_hist = db.clone();
     let db_tag2 = db.clone();
     let db_tag3 = db.clone();
+    let db_tag4 = db.clone();
+    let db_tag5 = db.clone();
     let db_export = db.clone();
     let db_import = db.clone();
 
@@ -158,6 +161,25 @@ pub fn Workspace(
                                 }
                             }
                         })}
+                    }
+                    // Backlinks panel
+                    if selected_id.read().is_some() {
+                        div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
+                        crate::ui::sidebar::backlinks::BacklinksPanel {
+                            note_id: selected_id.read().clone(),
+                            db: db_tag4.clone(),
+                            on_open: move |note_id: String| {
+                                if let Some(ref d) = db_smart2 { if let Ok(Some(n)) = NoteService::new(d).get(&note_id) {
+                                    selected_id.set(Some(note_id.clone())); title.set(n.title); content.set(n.content);
+                                }}
+                            },
+                        }
+                    }
+
+                    // Tag tree
+                    if *view.read() == View::AllNotes {
+                        div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
+                        crate::ui::sidebar::tag_tree::TagTree { db: db_tag5.clone(), selected_note_id: selected_id.read().clone() }
                     }
                 }
 
