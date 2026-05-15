@@ -24,6 +24,8 @@ See `docs/architecture.md` for full details. See `docs/Design/` for UI mockups. 
 - Folder-level `Test.md` must list all unit and integration tests, organized by file, with descriptions
 - **Every time you add/modify/remove a test**, update the relevant `Test.md`
 - **Every time you modify a .rs file**, ensure the folder's `README.md` and `Test.md` are also staged
+- **When running tests, always reference the Test.md of the folder you're working in** — it lists every test with descriptions
+- For example: modifying `src/core/note.rs` → check `src/core/Test.md` → run `cargo test test_create_note test_update_note` etc.
 - Document every iteration: after each significant change, update the relevant README/Test.md
 - All markdown rendering uses `pulldown-cmark`
 - All encryption uses XChaCha20-Poly1305 + Argon2id key derivation
