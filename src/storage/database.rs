@@ -14,6 +14,7 @@ pub enum DatabaseError {
 
 pub struct Database {
     conn: Mutex<rusqlite::Connection>,
+    encryption_key: Mutex<Option<[u8; 32]>>,
 }
 
 impl PartialEq for Database {
@@ -35,6 +36,7 @@ impl Database {
 
         Ok(Self {
             conn: Mutex::new(conn),
+            encryption_key: Mutex::new(None),
         })
     }
 
@@ -45,12 +47,30 @@ impl Database {
         migrations::run(&conn)?;
         Ok(Self {
             conn: Mutex::new(conn),
+            encryption_key: Mutex::new(None),
         })
     }
 
     /// Get a reference to the underlying connection.
     pub fn conn(&self) -> std::sync::MutexGuard<'_, rusqlite::Connection> {
         self.conn.lock().unwrap()
+    }
+
+    /// Set the encryption key used for encrypting/decrypting note content.
+    pub fn set_encryption_key(&self, key: [u8; 32]) {
+        let mut k = self.encryption_key.lock().unwrap();
+        *k = Some(key);
+    }
+
+    /// Get the encryption key, if set.
+    pub fn encryption_key(&self) -> [u8; 32] {
+        let k = self.encryption_key.lock().unwrap();
+        k.unwrap_or([0u8; 32])
+    }
+
+    /// Check if encryption is enabled.
+    pub fn is_encryption_enabled(&self) -> bool {
+        self.encryption_key.lock().unwrap().is_some()
     }
 }
 

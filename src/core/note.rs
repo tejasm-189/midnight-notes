@@ -1,10 +1,33 @@
 use chrono::Utc;
 use uuid::Uuid;
 
+use crate::crypto::cipher;
 use crate::storage::models::Note;
 use crate::storage::Database;
 
 use super::NoteServiceError;
+
+fn encrypt(db: &Database, text: &str) -> String {
+    if db.is_encryption_enabled() {
+        let key = db.encryption_key();
+        if let Ok(enc) = cipher::xchacha20_encrypt(&key, text.as_bytes()) {
+            return hex::encode(enc);
+        }
+    }
+    text.to_string()
+}
+
+fn decrypt(db: &Database, text: &str) -> String {
+    if db.is_encryption_enabled() {
+        let key = db.encryption_key();
+        if let Ok(bytes) = hex::decode(text) {
+            if let Ok(dec) = cipher::xchacha20_decrypt(&key, &bytes) {
+                return String::from_utf8_lossy(&dec).to_string();
+            }
+        }
+    }
+    text.to_string()
+}
 
 pub struct NoteService<'a> {
     db: &'a Database,
@@ -20,10 +43,12 @@ impl<'a> NoteService<'a> {
         let conn = self.db.conn();
         let id = Uuid::new_v4().to_string();
         let now = Utc::now().to_rfc3339();
+        let enc_content = encrypt(self.db, content);
+        let enc_title = encrypt(self.db, title);
 
         conn.execute(
             "INSERT INTO notes (id, title, content, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![id, title, content, now, now],
+            params![id, enc_title, enc_content, now, now],
         )?;
 
         Ok(Note {
@@ -33,7 +58,7 @@ impl<'a> NoteService<'a> {
             is_pinned: false,
             is_archived: false,
             is_trashed: false,
-            encrypted: true,
+            encrypted: self.db.is_encryption_enabled(),
             created_at: Utc::now(),
             updated_at: Utc::now(),
         })
@@ -47,25 +72,7 @@ impl<'a> NoteService<'a> {
              FROM notes WHERE id = ?1",
         )?;
 
-        let mut rows = stmt.query_map(params![id], |row| {
-            Ok(Note {
-                id: row.get(0)?,
-                title: row.get(1)?,
-                content: row.get(2)?,
-                is_pinned: row.get::<_, i32>(3)? != 0,
-                is_archived: row.get::<_, i32>(4)? != 0,
-                is_trashed: row.get::<_, i32>(5)? != 0,
-                encrypted: row.get::<_, i32>(6)? != 0,
-                created_at: row
-                    .get::<_, String>(7)?
-                    .parse()
-                    .unwrap_or_else(|_| Utc::now()),
-                updated_at: row
-                    .get::<_, String>(8)?
-                    .parse()
-                    .unwrap_or_else(|_| Utc::now()),
-            })
-        })?;
+        let mut rows = stmt.query_map(params![id], |row| self.note_from_row(row))?;
 
         match rows.next() {
             Some(Ok(note)) => Ok(Some(note)),
@@ -150,6 +157,29 @@ impl<'a> NoteService<'a> {
         Ok(new)
     }
 
+    /// Helper to construct a Note from a database row, with decryption.
+    fn note_from_row(&self, row: &rusqlite::Row) -> rusqlite::Result<Note> {
+        let raw_title: String = row.get(1)?;
+        let raw_content: String = row.get(2)?;
+        Ok(Note {
+            id: row.get(0)?,
+            title: decrypt(self.db, &raw_title),
+            content: decrypt(self.db, &raw_content),
+            is_pinned: row.get::<_, i32>(3)? != 0,
+            is_archived: row.get::<_, i32>(4)? != 0,
+            is_trashed: row.get::<_, i32>(5)? != 0,
+            encrypted: row.get::<_, i32>(6)? != 0,
+            created_at: row
+                .get::<_, String>(7)?
+                .parse()
+                .unwrap_or_else(|_| Utc::now()),
+            updated_at: row
+                .get::<_, String>(8)?
+                .parse()
+                .unwrap_or_else(|_| Utc::now()),
+        })
+    }
+
     /// List all active (non-trashed, non-archived) notes, newest first.
     pub fn list_active(&self) -> Result<Vec<Note>, NoteServiceError> {
         let conn = self.db.conn();
@@ -160,25 +190,7 @@ impl<'a> NoteService<'a> {
         )?;
 
         let notes = stmt
-            .query_map([], |row| {
-                Ok(Note {
-                    id: row.get(0)?,
-                    title: row.get(1)?,
-                    content: row.get(2)?,
-                    is_pinned: row.get::<_, i32>(3)? != 0,
-                    is_archived: row.get::<_, i32>(4)? != 0,
-                    is_trashed: row.get::<_, i32>(5)? != 0,
-                    encrypted: row.get::<_, i32>(6)? != 0,
-                    created_at: row
-                        .get::<_, String>(7)?
-                        .parse()
-                        .unwrap_or_else(|_| Utc::now()),
-                    updated_at: row
-                        .get::<_, String>(8)?
-                        .parse()
-                        .unwrap_or_else(|_| Utc::now()),
-                })
-            })?
+            .query_map([], |row| self.note_from_row(row))?
             .filter_map(|r| r.ok())
             .collect();
 
@@ -194,25 +206,7 @@ impl<'a> NoteService<'a> {
              ORDER BY updated_at DESC",
         )?;
         let notes = stmt
-            .query_map([], |row| {
-                Ok(Note {
-                    id: row.get(0)?,
-                    title: row.get(1)?,
-                    content: row.get(2)?,
-                    is_pinned: row.get::<_, i32>(3)? != 0,
-                    is_archived: row.get::<_, i32>(4)? != 0,
-                    is_trashed: row.get::<_, i32>(5)? != 0,
-                    encrypted: row.get::<_, i32>(6)? != 0,
-                    created_at: row
-                        .get::<_, String>(7)?
-                        .parse()
-                        .unwrap_or_else(|_| Utc::now()),
-                    updated_at: row
-                        .get::<_, String>(8)?
-                        .parse()
-                        .unwrap_or_else(|_| Utc::now()),
-                })
-            })?
+            .query_map([], |row| self.note_from_row(row))?
             .filter_map(|r| r.ok())
             .collect();
         Ok(notes)
@@ -252,25 +246,7 @@ impl<'a> NoteService<'a> {
         )?;
 
         let notes = stmt
-            .query_map([], |row| {
-                Ok(Note {
-                    id: row.get(0)?,
-                    title: row.get(1)?,
-                    content: row.get(2)?,
-                    is_pinned: row.get::<_, i32>(3)? != 0,
-                    is_archived: row.get::<_, i32>(4)? != 0,
-                    is_trashed: row.get::<_, i32>(5)? != 0,
-                    encrypted: row.get::<_, i32>(6)? != 0,
-                    created_at: row
-                        .get::<_, String>(7)?
-                        .parse()
-                        .unwrap_or_else(|_| Utc::now()),
-                    updated_at: row
-                        .get::<_, String>(8)?
-                        .parse()
-                        .unwrap_or_else(|_| Utc::now()),
-                })
-            })?
+            .query_map([], |row| self.note_from_row(row))?
             .filter_map(|r| r.ok())
             .collect();
 

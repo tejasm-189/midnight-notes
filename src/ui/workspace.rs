@@ -68,6 +68,7 @@ pub fn Workspace(
     let db_tag5 = db.clone();
     let db_tag6 = db.clone();
     let db_side_all2 = db.clone();
+    let db_daily = db.clone();
     let db_export = db.clone();
     let db_import = db.clone();
 
@@ -144,6 +145,22 @@ pub fn Workspace(
                 div { style: "flex: 1; overflow-y: auto;",
                     SidebarItem { icon: "description", label: "All Notes", active: matches!(*view.read(), View::AllNotes), onclick: move |_| { view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
                     SidebarItem { icon: "auto_awesome", label: "Smart Views", active: matches!(*view.read(), View::SmartViews), onclick: move |_| view.set(View::SmartViews) }
+                    SidebarItem { icon: "today", label: "Daily Note", active: false, onclick: move |_| {
+                        if let Some(ref d) = db_daily {
+                            let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
+                            let note_svc = NoteService::new(d);
+                            // Check if today's note exists
+                            let existing = note_svc.search(&today).ok().and_then(|r| r.into_iter().find(|(n, _)| n.title.contains(&today)).map(|(n, _)| n));
+                            if let Some(note) = existing {
+                                selected_id.set(Some(note.id.clone())); title.set(note.title); content.set(note.content);
+                                if let Ok(tags) = TagService::new(d).get_tags_for_note(&note.id) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); }
+                                if let Ok(h) = HistoryService::new(d).list(&note.id) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); }
+                            } else if let Ok(note) = note_svc.create(&today, "") {
+                                title.set(note.title.clone()); content.set(note.content.clone()); selected_id.set(Some(note.id.clone()));
+                                notes.write().insert(0, note);
+                            }
+                        }
+                    } }
                     div { style: "height: 1px; background: {c.border}; margin: 8px 16px;" }
                     SidebarItem { icon: "archive", label: "Archived", active: matches!(*view.read(), View::Archived), onclick: move |_| { view.set(View::Archived); refresh_notes(&db_side_arch, &View::Archived, &notes, ""); } }
                     SidebarItem { icon: "delete", label: "Trash", active: matches!(*view.read(), View::Trash), onclick: move |_| { view.set(View::Trash); refresh_notes(&db_side_trash, &View::Trash, &notes, ""); } }
