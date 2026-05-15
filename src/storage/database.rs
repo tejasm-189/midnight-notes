@@ -106,6 +106,15 @@ mod tests {
         let dir = tempdir().unwrap();
         let db_path = dir.path().join("test2.db");
         Database::open(&db_path).unwrap();
-        Database::open(&db_path).unwrap(); // second open should work
+        Database::open(&db_path).unwrap();
+    }
+
+    #[test]
+    fn test_encryption_key() {
+        let db = Database::open_in_memory().unwrap();
+        assert!(!db.is_encryption_enabled());
+        db.set_encryption_key([0x42u8; 32]);
+        assert!(db.is_encryption_enabled());
+        assert_eq!(db.encryption_key(), [0x42u8; 32]);
     }
 }

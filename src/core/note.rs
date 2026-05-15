@@ -396,6 +396,37 @@ mod tests {
     }
 
     #[test]
+    fn test_list_archived() {
+        with_service(|service| {
+            let note = service.create("Test", "Content").unwrap();
+            service.toggle_archive(&note.id).unwrap();
+            let archived = service.list_archived().unwrap();
+            assert_eq!(archived.len(), 1);
+            assert_eq!(archived[0].id, note.id);
+        });
+    }
+
+    #[test]
+    fn test_restore_from_trash() {
+        with_service(|service| {
+            let note = service.create("Test", "Content").unwrap();
+            service.trash(&note.id).unwrap();
+            service.restore(&note.id).unwrap();
+            let active = service.list_active().unwrap();
+            assert!(active.iter().any(|n| n.id == note.id));
+        });
+    }
+
+    #[test]
+    fn test_delete_permanently() {
+        with_service(|service| {
+            let note = service.create("Test", "Content").unwrap();
+            service.delete_permanently(&note.id).unwrap();
+            assert!(service.get(&note.id).unwrap().is_none());
+        });
+    }
+
+    #[test]
     fn test_search() {
         with_service(|service| {
             service

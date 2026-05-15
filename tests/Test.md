@@ -1,6 +1,6 @@
 # Tests — tests/
 
-## integration.rs (9 tests)
+## integration.rs (11 tests)
 | Test | What it verifies |
 |------|-----------------|
 | `test_note_lifecycle` | CRUD, pin, archive, trash, delete end-to-end |

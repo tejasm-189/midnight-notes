@@ -241,3 +241,70 @@ fn test_search_filters() {
     let results = search_svc.search("tag:backend API").unwrap();
     assert!(!results.is_empty());
 }
+
+#[test]
+fn test_tag_search_workflow() {
+    let db = setup_db();
+    let note_svc = NoteService::new(&db);
+    let tag_svc = TagService::new(&db);
+    let search_svc = SearchService::new(&db);
+
+    // Create notes with tags
+    let n1 = note_svc
+        .create("Rust Ownership", "Learn about borrowing")
+        .unwrap();
+    let n2 = note_svc
+        .create("Rust Traits", "Learn about generics")
+        .unwrap();
+    let tag = tag_svc.create("rust", None, None).unwrap();
+    tag_svc.assign_to_note(&tag.id, &n1.id).unwrap();
+    tag_svc.assign_to_note(&tag.id, &n2.id).unwrap();
+
+    // Tag tree: list roots should include this tag
+    let roots = tag_svc.list_roots().unwrap();
+    assert!(roots.iter().any(|t| t.name == "rust"));
+
+    // Get all tags for a note
+    let tags = tag_svc.get_tags_for_note(&n1.id).unwrap();
+    assert!(tags.iter().any(|t| t.name == "rust"));
+
+    // Remove tag and verify
+    tag_svc.remove_from_note(&tag.id, &n1.id).unwrap();
+    let tags = tag_svc.get_tags_for_note(&n1.id).unwrap();
+    assert!(tags.is_empty());
+
+    // FTS5 still works without tags
+    let results = search_svc.search("Rust").unwrap();
+    assert_eq!(results.len(), 2);
+}
+
+#[test]
+fn test_restore_workflow() {
+    let db = setup_db();
+    let note_svc = NoteService::new(&db);
+    let hist_svc = HistoryService::new(&db);
+
+    let note = note_svc.create("Original", "Content").unwrap();
+    note_svc.update(&note.id, "Updated", "Changed").unwrap();
+
+    // Move to trash
+    note_svc.trash(&note.id).unwrap();
+    assert!(note_svc
+        .list_trashed()
+        .unwrap()
+        .iter()
+        .any(|n| n.id == note.id));
+
+    // Restore from trash
+    note_svc.restore(&note.id).unwrap();
+    assert!(note_svc
+        .list_active()
+        .unwrap()
+        .iter()
+        .any(|n| n.id == note.id));
+
+    // History still intact after restore
+    let history = hist_svc.list(&note.id).unwrap();
+    assert_eq!(history.len(), 1);
+    assert_eq!(history[0].content_snapshot, "Content");
+}

@@ -1,11 +1,12 @@
 # Tests — src/storage/
 
-## database.rs (3 tests)
+## database.rs (4 tests)
 | Test | What it verifies |
 |------|-----------------|
 | `test_open_and_create` | Opening a DB creates the notes table |
 | `test_open_in_memory` | In-memory database works |
 | `test_open_twice` | Opening same file twice succeeds |
+| `test_encryption_key` | Set/get encryption key, is_encryption_enabled |
 
 ## migrations.rs (3 tests)
 | Test | What it verifies |

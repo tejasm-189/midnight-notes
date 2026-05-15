@@ -1,6 +1,6 @@
 # Tests — src/core/
 
-## note.rs (9 tests)
+## note.rs (12 tests)
 | Test | What it verifies |
 |------|-----------------|
 | `test_create_note` | Create note with title + content |
@@ -12,6 +12,9 @@
 | `test_toggle_pin` | Toggle pin toggles the pinned flag |
 | `test_list_active_ordering` | Pinned notes appear first |
 | `test_search` | FTS5 search finds matching notes |
+| `test_list_archived` | Archived notes list |
+| `test_restore_from_trash` | Trashed → restored → appears in active |
+| `test_delete_permanently` | Permanent delete removes note completely |
 
 ## tag.rs (12 tests)
 | Test | What it verifies |
