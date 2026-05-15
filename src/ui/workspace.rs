@@ -143,7 +143,7 @@ pub fn Workspace(
                     span { class: "material-symbols-outlined", style: "font-size: 16px;", "add" } "New Note"
                 }
                 div { style: "flex: 1; overflow-y: auto;",
-                    SidebarItem { icon: "description", label: "All Notes", active: matches!(*view.read(), View::AllNotes), onclick: move |_| { view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
+                    SidebarItem { icon: "description", label: "All Notes", active: matches!(*view.read(), View::AllNotes), onclick: move |_| { query.set(String::new()); view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
                     SidebarItem { icon: "auto_awesome", label: "Smart Views", active: matches!(*view.read(), View::SmartViews), onclick: move |_| view.set(View::SmartViews) }
                     SidebarItem { icon: "today", label: "Daily Note", active: false, onclick: move |_| {
                         if let Some(ref d) = db_daily {
