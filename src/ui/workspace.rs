@@ -106,128 +106,132 @@ pub fn Workspace(
                 }
             }
 
-            aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
-                div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
-                    div { style: "position: relative;",
-                        span { class: "material-symbols-outlined", style: "position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 14px; color: {c.text_secondary};", "search" }
-                        input { r#type: "text", placeholder: "Search (e.g. tag:work has:todo)", value: "{query}",
-                            oninput: move |e| { query.set(e.value()); refresh_notes(&db_search, &view.read(), &notes, &e.value()); },
-                            style: "width: 100%; height: 32px; background: {c.bg_surface}; border: 1px solid {c.border}; border-radius: 4px; padding: 4px 8px 4px 28px; color: {c.text_primary}; font-family: Inter; font-size: 13px; outline: none;",
+            if *view.read() == View::SmartViews {
+                crate::ui::smart_view::SmartViewPanel { db: db.clone() }
+            } else {
+                aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
+                    div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
+                        div { style: "position: relative;",
+                            span { class: "material-symbols-outlined", style: "position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 14px; color: {c.text_secondary};", "search" }
+                            input { r#type: "text", placeholder: "Search (e.g. tag:work has:todo)", value: "{query}",
+                                oninput: move |e| { query.set(e.value()); refresh_notes(&db_search, &view.read(), &notes, &e.value()); },
+                                style: "width: 100%; height: 32px; background: {c.bg_surface}; border: 1px solid {c.border}; border-radius: 4px; padding: 4px 8px 4px 28px; color: {c.text_primary}; font-family: Inter; font-size: 13px; outline: none;",
+                            }
                         }
                     }
-                }
-                div { style: "flex: 1; overflow-y: auto;",
-                    {let di = db.clone(); notes.read().iter().map(move |note| {
-                        let act = selected_id.read().as_deref() == Some(&note.id);
-                        let bg = if act { c.bg_surface_high } else { "transparent" };
-                        let tc = if act { c.accent } else { c.text_primary };
-                        let nid1 = note.id.clone(); let nid2 = note.id.clone();
-                        let dc1 = di.clone(); let dc2 = di.clone();
-                        let v = *view.read();
-                        rsx! {
-                            div { key: "{note.id}", style: "padding: 14px 16px; border-bottom: 1px solid {c.border}; background: {bg}; cursor: pointer; position: relative;",
-                                onclick: move |_| {
-                                    if let Some(ref d) = dc1 { if let Ok(Some(n)) = NoteService::new(d).get(&nid1) {
-                                        selected_id.set(Some(nid1.clone())); title.set(n.title); content.set(n.content);
-                                        if let Ok(tags) = TagService::new(d).get_tags_for_note(&nid1) { note_tags.set(tags.iter().map(|t| t.name.clone()).collect()); }
-                                    }}
-                                },
-                                if act { div { style: "position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: {c.accent};" } }
-                                div { style: "display: flex; justify-content: space-between; margin-bottom: 4px;",
-                                    h3 { style: "font-family: Inter; font-size: 14px; font-weight: 600; color: {tc}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;", "{note.title}" }
-                                    if note.is_pinned { span { class: "material-symbols-outlined fill", style: "font-size: 14px; color: {c.accent};", "push_pin" } }
-                                }
-                                p { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px;",
-                                    if note.content.is_empty() { "Empty note" } else { "{&note.content}" }
-                                }
-                                div { style: "display: flex; justify-content: space-between; align-items: center;",
-                                    span { style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {c.text_secondary};", "{fmt_date(note)}" }
-                                    if v == View::Trash {
-                                        button { style: "font-family: 'JetBrains Mono', monospace; font-size: 10px; color: {c.error}; background: none; border: none; cursor: pointer; padding: 2px 4px;",
-                                            onclick: move |_| { if let Some(ref d) = dc2 { let _ = NoteService::new(d).delete_permanently(&nid2); let mut n = notes; n.write().retain(|x| x.id != nid2); } },
-                                            "Delete permanently"
+                    div { style: "flex: 1; overflow-y: auto;",
+                        {let di = db.clone(); notes.read().iter().map(move |note| {
+                            let act = selected_id.read().as_deref() == Some(&note.id);
+                            let bg = if act { c.bg_surface_high } else { "transparent" };
+                            let tc = if act { c.accent } else { c.text_primary };
+                            let nid1 = note.id.clone(); let nid2 = note.id.clone();
+                            let dc1 = di.clone(); let dc2 = di.clone();
+                            let v = *view.read();
+                            rsx! {
+                                div { key: "{note.id}", style: "padding: 14px 16px; border-bottom: 1px solid {c.border}; background: {bg}; cursor: pointer; position: relative;",
+                                    onclick: move |_| {
+                                        if let Some(ref d) = dc1 { if let Ok(Some(n)) = NoteService::new(d).get(&nid1) {
+                                            selected_id.set(Some(nid1.clone())); title.set(n.title); content.set(n.content);
+                                            if let Ok(tags) = TagService::new(d).get_tags_for_note(&nid1) { note_tags.set(tags.iter().map(|t| t.name.clone()).collect()); }
+                                        }}
+                                    },
+                                    if act { div { style: "position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: {c.accent};" } }
+                                    div { style: "display: flex; justify-content: space-between; margin-bottom: 4px;",
+                                        h3 { style: "font-family: Inter; font-size: 14px; font-weight: 600; color: {tc}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;", "{note.title}" }
+                                        if note.is_pinned { span { class: "material-symbols-outlined fill", style: "font-size: 14px; color: {c.accent};", "push_pin" } }
+                                    }
+                                    p { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px;",
+                                        if note.content.is_empty() { "Empty note" } else { "{&note.content}" }
+                                    }
+                                    div { style: "display: flex; justify-content: space-between; align-items: center;",
+                                        span { style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {c.text_secondary};", "{fmt_date(note)}" }
+                                        if v == View::Trash {
+                                            button { style: "font-family: 'JetBrains Mono', monospace; font-size: 10px; color: {c.error}; background: none; border: none; cursor: pointer; padding: 2px 4px;",
+                                                onclick: move |_| { if let Some(ref d) = dc2 { let _ = NoteService::new(d).delete_permanently(&nid2); let mut n = notes; n.write().retain(|x| x.id != nid2); } },
+                                                "Delete permanently"
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    })}
-                    if notes.read().is_empty() {
-                        div { style: "padding: 32px; text-align: center; font-family: Inter; font-size: 13px; color: {c.text_muted};", p { "{get_empty_msg(*view.read())}" } }
-                    }
-                }
-            }
-
-            section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
-                header { style: "height: 56px; background: {c.bg_canvas}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;",
-                    div { style: "display: flex; background: {c.bg_surface}; border-radius: 4px; border: 1px solid {c.border}; padding: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px;",
-                        ModeBtn { label: "Prose", active: mode() == "Prose", onclick: move |_| mode.set("Prose") }
-                        ModeBtn { label: "Code", active: mode() == "Code", onclick: move |_| mode.set("Code") }
-                        ModeBtn { label: "Vim", active: mode() == "Vim", onclick: move |_| mode.set("Vim") }
-                    }
-                    div { style: "display: flex; align-items: center; gap: 6px;",
-                        span { style: "display: flex; align-items: center; gap: 4px; font-size: 10px; color: {c.accent_green}; background: {c.bg_surface_high}; padding: 4px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;",
-                            span { class: "material-symbols-outlined", style: "font-size: 12px;", "lock" } "Encrypted"
-                        }
-                        button { style: "color: {c.accent}; background: none; border: none; padding: 4px; cursor: pointer;",
-                            onclick: move |_| { if let Some(ref d) = db_pin { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_pin(&id); refresh_notes(&db_pin_r, &view.read(), &notes, ""); } } },
-                            span { class: "material-symbols-outlined", style: "font-size: 18px;", "push_pin" }
-                        }
-                        button { style: "color: {c.text_secondary}; background: none; border: none; padding: 4px; cursor: pointer;",
-                            onclick: move |_| { if let Some(ref d) = db_arch { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_archive(&id); selected_id.set(None); title.set(String::new()); content.set(String::new()); refresh_notes(&db_arch_r, &view.read(), &notes, ""); } } },
-                            span { class: "material-symbols-outlined", style: "font-size: 18px;", "archive" }
-                        }
-                        button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer;",
-                            onclick: move |_| { if let Some(ref d) = db_save { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).update(&id, &title.read(), &content.read()); refresh_notes(&db_save_r, &view.read(), &notes, ""); } } },
-                            "Save"
+                        })}
+                        if notes.read().is_empty() {
+                            div { style: "padding: 32px; text-align: center; font-family: Inter; font-size: 13px; color: {c.text_muted};", p { "{get_empty_msg(*view.read())}" } }
                         }
                     }
                 }
 
-                if selected_id.read().is_some() {
-                    div { style: "flex: 1; overflow-y: auto; display: flex; justify-content: center;",
-                        div { style: "width: 100%; max-width: 840px; padding: 24px 32px; position: relative;",
-                            div { style: "position: absolute; left: 0; top: 0; bottom: 0; width: 32px; border-right: 1px solid {c.border}; display: flex; flex-direction: column; align-items: flex-end; padding: 24px 8px 24px 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: {c.border}; opacity: 0.3; user-select: none;",
-                                { (1..=30).map(|i| rsx! { span { "{i}" } }) }
+                section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
+                    header { style: "height: 56px; background: {c.bg_canvas}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;",
+                        div { style: "display: flex; background: {c.bg_surface}; border-radius: 4px; border: 1px solid {c.border}; padding: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px;",
+                            ModeBtn { label: "Prose", active: mode() == "Prose", onclick: move |_| mode.set("Prose") }
+                            ModeBtn { label: "Code", active: mode() == "Code", onclick: move |_| mode.set("Code") }
+                            ModeBtn { label: "Vim", active: mode() == "Vim", onclick: move |_| mode.set("Vim") }
+                        }
+                        div { style: "display: flex; align-items: center; gap: 6px;",
+                            span { style: "display: flex; align-items: center; gap: 4px; font-size: 10px; color: {c.accent_green}; background: {c.bg_surface_high}; padding: 4px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;",
+                                span { class: "material-symbols-outlined", style: "font-size: 12px;", "lock" } "Encrypted"
                             }
-                            div { style: "padding-left: 48px;",
-                                input { r#type: "text", value: "{title}", oninput: move |e| title.set(e.value()),
-                                    style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                            button { style: "color: {c.accent}; background: none; border: none; padding: 4px; cursor: pointer;",
+                                onclick: move |_| { if let Some(ref d) = db_pin { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_pin(&id); refresh_notes(&db_pin_r, &view.read(), &notes, ""); } } },
+                                span { class: "material-symbols-outlined", style: "font-size: 18px;", "push_pin" }
+                            }
+                            button { style: "color: {c.text_secondary}; background: none; border: none; padding: 4px; cursor: pointer;",
+                                onclick: move |_| { if let Some(ref d) = db_arch { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_archive(&id); selected_id.set(None); title.set(String::new()); content.set(String::new()); refresh_notes(&db_arch_r, &view.read(), &notes, ""); } } },
+                                span { class: "material-symbols-outlined", style: "font-size: 18px;", "archive" }
+                            }
+                            button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer;",
+                                onclick: move |_| { if let Some(ref d) = db_save { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).update(&id, &title.read(), &content.read()); refresh_notes(&db_save_r, &view.read(), &notes, ""); } } },
+                                "Save"
+                            }
+                        }
+                    }
+
+                    if selected_id.read().is_some() {
+                        div { style: "flex: 1; overflow-y: auto; display: flex; justify-content: center;",
+                            div { style: "width: 100%; max-width: 840px; padding: 24px 32px; position: relative;",
+                                div { style: "position: absolute; left: 0; top: 0; bottom: 0; width: 32px; border-right: 1px solid {c.border}; display: flex; flex-direction: column; align-items: flex-end; padding: 24px 8px 24px 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: {c.border}; opacity: 0.3; user-select: none;",
+                                    { (1..=30).map(|i| rsx! { span { "{i}" } }) }
                                 }
-                                if *view.read() == View::Trash {
-                                    div { style: "padding: 12px; background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; margin-bottom: 16px; display: flex; gap: 8px; align-items: center;",
-                                        span { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; flex: 1;", "This note is in the Trash." }
-                                        button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; cursor: pointer;",
-                                            onclick: move |_| { if let Some(ref d) = db_restore { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).restore(&id); selected_id.set(None); refresh_notes(&db_restore_r, &View::Trash, &notes, ""); } } },
-                                            "Restore"
-                                        }
-                                        button { style: "background: none; border: 1px solid {c.error}; color: {c.error}; border-radius: 4px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; cursor: pointer;",
-                                            onclick: move |_| { if let Some(ref d) = db_del { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).delete_permanently(&id); selected_id.set(None); title.set(String::new()); content.set(String::new()); refresh_notes(&db_del_r, &View::Trash, &notes, ""); } } },
-                                            "Delete forever"
+                                div { style: "padding-left: 48px;",
+                                    input { r#type: "text", value: "{title}", oninput: move |e| title.set(e.value()),
+                                        style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                                    }
+                                    if *view.read() == View::Trash {
+                                        div { style: "padding: 12px; background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; margin-bottom: 16px; display: flex; gap: 8px; align-items: center;",
+                                            span { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; flex: 1;", "This note is in the Trash." }
+                                            button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; cursor: pointer;",
+                                                onclick: move |_| { if let Some(ref d) = db_restore { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).restore(&id); selected_id.set(None); refresh_notes(&db_restore_r, &View::Trash, &notes, ""); } } },
+                                                "Restore"
+                                            }
+                                            button { style: "background: none; border: 1px solid {c.error}; color: {c.error}; border-radius: 4px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; cursor: pointer;",
+                                                onclick: move |_| { if let Some(ref d) = db_del { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).delete_permanently(&id); selected_id.set(None); title.set(String::new()); content.set(String::new()); refresh_notes(&db_del_r, &View::Trash, &notes, ""); } } },
+                                                "Delete forever"
+                                            }
                                         }
                                     }
-                                }
-                                textarea { value: "{content}", oninput: move |e| content.set(e.value()),
-                                    style: "width: 100%; min-height: 60vh; background: transparent; border: none; color: {c.text_primary}; font-family: Inter; font-size: 16px; line-height: 1.7; resize: none; outline: none;",
+                                    textarea { value: "{content}", oninput: move |e| content.set(e.value()),
+                                        style: "width: 100%; min-height: 60vh; background: transparent; border: none; color: {c.text_primary}; font-family: Inter; font-size: 16px; line-height: 1.7; resize: none; outline: none;",
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        div { style: "flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;",
+                            span { class: "material-symbols-outlined", style: "font-size: 48px; color: {c.border};", "description" }
+                            p { style: "font-family: Inter; font-size: 16px; color: {c.text_muted};", "Select a note or create a new one" }
+                        }
                     }
-                } else {
-                    div { style: "flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;",
-                        span { class: "material-symbols-outlined", style: "font-size: 48px; color: {c.border};", "description" }
-                        p { style: "font-family: Inter; font-size: 16px; color: {c.text_muted};", "Select a note or create a new one" }
-                    }
-                }
 
-                footer { style: "height: 28px; background: {c.bg_canvas}; border-top: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px;",
-                    div { style: "display: flex; align-items: center; gap: 4px; font-weight: 700; color: {c.accent};",
-                        span { class: "material-symbols-outlined fill", style: "font-size: 12px; color: {c.accent_green};", "lock" } "End-to-End Encrypted"
-                    }
-                    div { style: "display: flex; gap: 16px; color: {c.text_muted};",
-                        span { "Words: {content.read().split_whitespace().count()}" }
-                        if *view.read() == View::Trash { span { style: "color: {c.error};", "Trash" } }
-                        if *view.read() == View::Archived { span { style: "color: {c.accent_yellow};", "Archived" } }
+                    footer { style: "height: 28px; background: {c.bg_canvas}; border-top: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px;",
+                        div { style: "display: flex; align-items: center; gap: 4px; font-weight: 700; color: {c.accent};",
+                            span { class: "material-symbols-outlined fill", style: "font-size: 12px; color: {c.accent_green};", "lock" } "End-to-End Encrypted"
+                        }
+                        div { style: "display: flex; gap: 16px; color: {c.text_muted};",
+                            span { "Words: {content.read().split_whitespace().count()}" }
+                            if *view.read() == View::Trash { span { style: "color: {c.error};", "Trash" } }
+                            if *view.read() == View::Archived { span { style: "color: {c.accent_yellow};", "Archived" } }
+                        }
                     }
                 }
             }

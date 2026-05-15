@@ -4,6 +4,7 @@ pub mod sidebar;
 pub mod app;
 pub mod search;
 pub mod settings;
+pub mod smart_view;
 pub mod theme;
 pub mod vault_lock;
 pub mod viewer;
