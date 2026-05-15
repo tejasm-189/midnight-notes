@@ -1,8 +1,7 @@
 # AGENTS.md — Midnight Notes
 
 ## Commands
-- Build desktop: `cargo tauri dev`
-- Build web: `cargo build --target wasm32-unknown-unknown`
+- Build desktop: `cargo run`
 - Test all: `cargo test`
 - Test specific: `cargo test test_name` or `cargo test --test integration`
 - Test with output: `cargo test -- --nocapture`
@@ -25,7 +24,13 @@ See `docs/architecture.md` for full details. See `docs/Design/` for UI mockups. 
 - **Every time you add/modify/remove a test**, update the relevant `Test.md`
 - **Every time you modify a .rs file**, ensure the folder's `README.md` and `Test.md` are also staged
 - **When running tests, always reference the Test.md of the folder you're working in** — it lists every test with descriptions
-- For example: modifying `src/core/note.rs` → check `src/core/Test.md` → run `cargo test test_create_note test_update_note` etc.
+- For example: modifying `src/core/note.rs` → check `src/core/Test.md` → run `cargo test creating_a_note_with_title_and_content_succeeds updating_note_title_and_content_persists_changes`
+- **Test names are descriptive sentences** — use them directly as test selectors:
+  ```bash
+  cargo test wrong_password_fails_import
+  cargo test trashing_a_note_moves_it_from_active_to_trash
+  cargo test pressing_escape_switches_insert_to_normal_mode
+  ```
 - Document every iteration: after each significant change, update the relevant README/Test.md
 - All markdown rendering uses `pulldown-cmark`
 - All encryption uses XChaCha20-Poly1305 + Argon2id key derivation
