@@ -5,34 +5,27 @@ echo "=== Pre-commit Hook ==="
 
 STAGED=$(git diff --cached --name-only 2>/dev/null || true)
 
-# For each staged .rs file, check README.md + Test.md in:
-#   - its own directory (unit tests)
-#   - all parent directories up to src/ (integration tests)
-echo "$STAGED" | grep '\.rs$' 2>/dev/null || true | while IFS= read -r rs_file; do
+# For each staged .rs file, check README.md + Test.md
+RS_FILES=$(echo "$STAGED" | grep '\.rs$' 2>/dev/null || true)
+echo "$RS_FILES" | while IFS= read -r rs_file; do
     [ -z "$rs_file" ] && continue
     dir=$(dirname "$rs_file")
 
-    # Check this dir and all parent dirs up to src/
     while [ "$dir" != "." ] && [ "$dir" != "/" ]; do
         readme="$dir/README.md"
         testmd="$dir/Test.md"
 
         if [ -f "$readme" ] && ! echo "$STAGED" | grep -qF "$readme"; then
-            echo "WARNING: $readme is not staged" >&2
-            echo "       You modified $rs_file — update $readme to reflect changes." >&2
+            echo "WARNING: $readme is not staged — update it." >&2
         fi
 
         if [ -f "$testmd" ] && ! echo "$STAGED" | grep -qF "$testmd"; then
-            echo "WARNING: $testmd is not staged" >&2
-            echo "       You modified $rs_file — update $testmd if you added/removed tests." >&2
+            echo "WARNING: $testmd is not staged — update it if tests changed." >&2
         fi
 
-        # Only go up if not already at src/
         parent=$(dirname "$dir")
         [ "$parent" = "$dir" ] && break
         dir="$parent"
-        # Stop at project root (where .gitignore lives)
-        [ ! -f "$dir/.gitignore" ] && [ "$dir" = "." ] && break
     done
 done
 
