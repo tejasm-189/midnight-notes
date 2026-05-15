@@ -13,7 +13,10 @@ struct SmartResult {
 }
 
 #[component]
-pub fn SmartViewPanel(db: Option<std::sync::Arc<crate::storage::Database>>) -> Element {
+pub fn SmartViewPanel(
+    db: Option<std::sync::Arc<crate::storage::Database>>,
+    on_select: EventHandler<String>,
+) -> Element {
     let c = use_theme_colors();
     let mut query = use_signal(String::new);
     let mut results = use_signal(Vec::<SmartResult>::new);
@@ -87,9 +90,11 @@ pub fn SmartViewPanel(db: Option<std::sync::Arc<crate::storage::Database>>) -> E
                         div { style: "display: grid; grid-template-columns: 2fr 1fr; gap: 16px;",
                             div { style: "display: flex; flex-direction: column; gap: 12px;",
                                 h3 { style: "font-size: 11px; color: {c.accent}; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em;", "Matches ({results.read().len()})" }
-                                {results.read().iter().map(|r| {
+                                {let os = on_select; results.read().iter().map(move |r| {
+                                    let nid = r.note_id.clone();
                                     rsx! {
                                         div { key: "{r.note_id}", style: "border: 1px solid {c.border}; background: {c.bg_surface}; border-radius: 4px; padding: 12px; cursor: pointer;",
+                                            onclick: move |_| os.call(nid.clone()),
                                             div { style: "display: flex; justify-content: space-between; margin-bottom: 4px;",
                                                 h4 { style: "font-family: Inter; font-size: 16px; font-weight: 600; color: {c.text_primary};", "{r.title}" }
                                                 span { style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {c.text_secondary};", "{r.updated_at}" }

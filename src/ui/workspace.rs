@@ -34,6 +34,7 @@ pub fn Workspace(
 
     // Pre-clone db for each closure that needs it
     let db_effect = db.clone();
+    let db_smart = db.clone();
     let db_new = db.clone();
     let db_pin = db.clone();
     let db_arch = db.clone();
@@ -107,7 +108,22 @@ pub fn Workspace(
             }
 
             if *view.read() == View::SmartViews {
-                crate::ui::smart_view::SmartViewPanel { db: db.clone() }
+                crate::ui::smart_view::SmartViewPanel {
+                    db: db.clone(),
+                    on_select: move |note_id: String| {
+                        if let Some(ref d) = db_smart {
+                            if let Ok(Some(n)) = NoteService::new(d).get(&note_id) {
+                                view.set(View::AllNotes);
+                                selected_id.set(Some(note_id.clone()));
+                                title.set(n.title);
+                                content.set(n.content);
+                                if let Ok(tags) = TagService::new(d).get_tags_for_note(&note_id) {
+                                    note_tags.set(tags.iter().map(|t| t.name.clone()).collect());
+                                }
+                            }
+                        }
+                    },
+                }
             } else {
                 aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
                     div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
