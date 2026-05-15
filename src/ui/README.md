@@ -13,7 +13,7 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 | `workspace.rs` | ✅ done | Main workspace: sidebar, note list with tag chips + context menu, editor (ProseEditor/CodeEditor/Vim modes), auto-save, calendar toggle |
 | `viewer.rs` | ✅ done | Read-only note viewer with markdown rendering |
 | `smart_view.rs` | ✅ done | Smart Views screen: FTS5 search, results grid, linked graph |
-| `settings.rs` | ✅ done | Settings screen with sidebar, theme switcher (Midnight/Dark/Light) |
+| `settings.rs` | ✅ done | Settings panel (inline in workspace), theme switcher (Midnight/Dark/Light) |
 | `theme.rs` | ✅ done | Theme provider system, ThemeColors struct, 3 themes |
 
 ## Sub-folders

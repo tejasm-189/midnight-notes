@@ -1,5 +1,14 @@
 # Tests — src/ui/editor/
 
+## prose.rs / code.rs
+No unit tests (UI components). Updated to use theme colors, removed duplicate title inputs.
+
+## spreadsheet.rs / kanban.rs
+Now use theme colors, full-height layout.
+No unit tests added.
+
+# Tests — src/ui/editor/
+
 ## vim.rs (8 tests)
 | Test | What it verifies |
 |------|-----------------|

@@ -463,15 +463,11 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         crate::ui::editor::prose::ProseEditor {
                                             content: content.read().clone(),
                                             oninput: move |c| content.set(c),
-                                            title: title.read().clone(),
-                                            ontitleinput: move |t| title.set(t),
                                         }
                                     } else if mode() == "Code" {
                                         crate::ui::editor::code::CodeEditor {
                                             content: content.read().clone(),
                                             oninput: move |c| content.set(c),
-                                            title: title.read().clone(),
-                                            ontitleinput: move |t| title.set(t),
                                         }
                                     } else if mode() == "Sheet" {
                                         crate::ui::editor::spreadsheet::SpreadsheetEditor {

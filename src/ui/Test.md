@@ -9,7 +9,7 @@
 | `editor/kanban.rs` | 2 | Kanban logic |
 
 ## Integration / Manual Testing
-UI components are primarily tested via visual inspection (Dioxus doesn't have a built-in test harness). Key flows to verify:
+UI components are tested via visual inspection. Key flows to verify:
 
 | Screen | What to test |
 |--------|-------------|
