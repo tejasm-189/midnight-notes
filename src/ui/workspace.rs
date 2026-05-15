@@ -65,6 +65,8 @@ pub fn Workspace(
     let db_tag3 = db.clone();
     let db_tag4 = db.clone();
     let db_tag5 = db.clone();
+    let db_tag6 = db.clone();
+    let db_side_all2 = db.clone();
     let db_export = db.clone();
     let db_import = db.clone();
 
@@ -133,7 +135,7 @@ pub fn Workspace(
                     SidebarItem { icon: "delete", label: "Trash", active: matches!(*view.read(), View::Trash), onclick: move |_| { view.set(View::Trash); refresh_notes(&db_side_trash, &View::Trash, &notes, ""); } }
 
                     // Tags section
-                    if !note_tags.read().is_empty() || selected_id.read().is_some() {
+                    if selected_id.read().is_some() {
                         div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
                         div { style: "padding: 4px 16px; font-size: 10px; color: {c.text_muted}; text-transform: uppercase; letter-spacing: 0.08em; display: flex; justify-content: space-between; align-items: center;",
                             span { "Tags" }
@@ -144,6 +146,7 @@ pub fn Workspace(
                         }
                         input { r#type: "text", placeholder: "Add tag...", value: "{tag_input}",
                             oninput: move |e| tag_input.set(e.value()),
+                            onkeydown: move |e| { if e.key() == dioxus::events::Key::Enter { let d = db_tag6.clone(); if let Some(ref d) = d { if let Some(ref nid) = *selected_id.read() { let t = tag_input.read().clone(); if !t.is_empty() { if let Ok(Some(tag)) = TagService::new(d).get_by_name(&t) { let _ = TagService::new(d).assign_to_note(&tag.id, nid); } else if let Ok(new_tag) = TagService::new(d).create(&t, None, None) { let _ = TagService::new(d).assign_to_note(&new_tag.id, nid); } tag_input.set(String::new()); if let Ok(tags) = TagService::new(d).get_tags_for_note(nid) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); } } } } } },
                             style: "width: calc(100% - 32px); margin: 0 16px 4px; background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 2px; padding: 4px 6px; color: {c.text_primary}; font-size: 11px; outline: none;",
                         }
                         {note_tags.read().iter().map(|t| {
@@ -179,7 +182,7 @@ pub fn Workspace(
                     // Tag tree
                     if *view.read() == View::AllNotes {
                         div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
-                        crate::ui::sidebar::tag_tree::TagTree { db: db_tag5.clone(), selected_note_id: selected_id.read().clone() }
+                        crate::ui::sidebar::tag_tree::TagTree { db: db_tag5.clone(), selected_note_id: selected_id.read().clone(), on_search_tag: move |tag_name| { query.set(format!("tag:{}", tag_name)); refresh_notes(&db_side_all2, &View::AllNotes, &notes, &format!("tag:{}", tag_name)); } }
                     }
                 }
 
