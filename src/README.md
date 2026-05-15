@@ -26,3 +26,4 @@ All application source code. Settings is now inline in workspace. Organized by l
 
 ## Notes
 - No file in `src/` should import Dioxus directly (UI layer only)
+

@@ -12,6 +12,18 @@
 | `pressing_enter_in_command_mode_returns_to_normal` | Enter returns to Normal |
 | `each_vim_mode_has_correct_label` | Each mode has correct label |
 
+## spreadsheet.rs (2 tests)
+| Test | What it verifies |
+|------|-----------------|
+| `adding_row_increases_row_count` | Clicking add row updates JSON state |
+| `editing_cell_updates_json_payload` | Input changes are reflected in note content |
+
+## kanban.rs (2 tests)
+| Test | What it verifies |
+|------|-----------------|
+| `adding_card_to_column_updates_tasks` | New task is added to the correct column list |
+| `renaming_column_updates_title` | Column title change persists in JSON |
+
 ## slash.rs (5 tests)
 | Test | What it verifies |
 |------|-----------------|

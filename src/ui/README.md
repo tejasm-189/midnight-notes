@@ -20,7 +20,7 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 
 | Folder | Status | Description |
 |--------|--------|-------------|
-| `editor/` | ✅ done | Prose/Code/Vim editors, slash commands |
+| `editor/` | ✅ done | Prose/Code/Vim/Sheet/Board editors, slash commands |
 | `sidebar/` | ✅ done | Backlinks panel, tag tree, calendar, smart views list, shared SidebarItem component |
 
 ## Progress
@@ -34,7 +34,7 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 - [x] Context menu on note cards (Pin, Archive, Delete via ⋮ button)
 - [x] Clickable tag chips on note cards (click to filter by tag)
 - [x] Date format: `Mon 15 May 2026 01:03 PM`
-- [x] Prose/Code/Vim mode switching in editor header
+- [x] Specialized Editors: Prose, Code, Vim, Sheet (Spreadsheet), Board (Kanban)
 - [x] Backlinks panel, tag tree, smart views list in sidebar
 
 ## Notes

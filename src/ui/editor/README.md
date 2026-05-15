@@ -11,6 +11,8 @@ Editor components for Prose, Code, and Vim modes, plus slash command palette.
 | `prose.rs` | ✅ done | Markdown editing with live preview (pulldown-cmark) |
 | `code.rs` | ✅ done | Code editing with monospace editor |
 | `vim.rs` | ✅ done | Vim mode state machine (normal/insert/visual/command) |
+| `spreadsheet.rs` | ✅ done | Spreadsheet editor (JSON persistence) |
+| `kanban.rs` | ✅ done | Kanban board editor (JSON persistence) |
 | `slash.rs` | ✅ done | Slash command palette (12 commands) |
 
 ## Progress
@@ -18,4 +20,6 @@ Editor components for Prose, Code, and Vim modes, plus slash command palette.
 - [x] Prose editor with split textarea/preview
 - [x] Code editor with monospace font
 - [x] Vim mode state machine + status bar
+- [x] Spreadsheet editor with dynamic grid
+- [x] Kanban board editor with drag-ready columns
 - [x] Slash command menu (table, code, image, math, todo, etc.)

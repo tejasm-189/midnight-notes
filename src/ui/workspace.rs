@@ -390,6 +390,8 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                             ModeBtn { label: "Prose", active: mode() == "Prose", onclick: move |_| mode.set("Prose") }
                             ModeBtn { label: "Code", active: mode() == "Code", onclick: move |_| mode.set("Code") }
                             ModeBtn { label: "Vim", active: mode() == "Vim", onclick: move |_| mode.set("Vim") }
+                            ModeBtn { label: "Sheet", active: mode() == "Sheet", onclick: move |_| mode.set("Sheet") }
+                            ModeBtn { label: "Board", active: mode() == "Board", onclick: move |_| mode.set("Board") }
                         }
                         div { style: "display: flex; align-items: center; gap: 6px;",
                             span { style: "display: flex; align-items: center; gap: 4px; font-size: 10px; color: {c.accent_green}; background: {c.bg_surface_high}; padding: 4px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;",
@@ -466,6 +468,20 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         }
                                     } else if mode() == "Code" {
                                         crate::ui::editor::code::CodeEditor {
+                                            content: content.read().clone(),
+                                            oninput: move |c| content.set(c),
+                                            title: title.read().clone(),
+                                            ontitleinput: move |t| title.set(t),
+                                        }
+                                    } else if mode() == "Sheet" {
+                                        crate::ui::editor::spreadsheet::SpreadsheetEditor {
+                                            content: content.read().clone(),
+                                            oninput: move |c| content.set(c),
+                                            title: title.read().clone(),
+                                            ontitleinput: move |t| title.set(t),
+                                        }
+                                    } else if mode() == "Board" {
+                                        crate::ui::editor::kanban::KanbanEditor {
                                             content: content.read().clone(),
                                             oninput: move |c| content.set(c),
                                             title: title.read().clone(),
