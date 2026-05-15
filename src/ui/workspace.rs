@@ -11,12 +11,14 @@ use crate::storage::models::Note;
 use crate::ui::app::SharedDb;
 use crate::ui::theme::use_theme_colors;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, PartialEq)]
 enum View {
     AllNotes,
     Archived,
     Trash,
     SmartViews,
+    Calendar,
+    CalendarDate(String),
 }
 
 #[component]
@@ -67,6 +69,7 @@ pub fn Workspace(
     let db_tag4 = db.clone();
     let db_tag5 = db.clone();
     let db_tag6 = db.clone();
+    let db_tag7 = db.clone();
     let db_side_all2 = db.clone();
     let db_daily = db.clone();
     let db_export = db.clone();
@@ -143,8 +146,9 @@ pub fn Workspace(
                     span { class: "material-symbols-outlined", style: "font-size: 16px;", "add" } "New Note"
                 }
                 div { style: "flex: 1; overflow-y: auto;",
-                    SidebarItem { icon: "description", label: "All Notes", active: matches!(*view.read(), View::AllNotes), onclick: move |_| { query.set(String::new()); view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
-                    SidebarItem { icon: "auto_awesome", label: "Smart Views", active: matches!(*view.read(), View::SmartViews), onclick: move |_| view.set(View::SmartViews) }
+                    SidebarItem { icon: "description", label: "All Notes", active: matches!(view.read().clone(), View::AllNotes), onclick: move |_| { query.set(String::new()); view.set(View::AllNotes); refresh_notes(&db_side_all, &View::AllNotes, &notes, ""); } }
+                    SidebarItem { icon: "auto_awesome", label: "Smart Views", active: matches!(view.read().clone(), View::SmartViews), onclick: move |_| view.set(View::SmartViews) }
+                    SidebarItem { icon: "calendar_month", label: "Calendar", active: matches!(*view.read(), View::Calendar | View::CalendarDate(_)), onclick: move |_| view.set(View::Calendar) }
                     SidebarItem { icon: "today", label: "Daily Note", active: false, onclick: move |_| {
                         if let Some(ref d) = db_daily {
                             let today = chrono::Utc::now().format("%Y-%m-%d").to_string();
@@ -162,8 +166,8 @@ pub fn Workspace(
                         }
                     } }
                     div { style: "height: 1px; background: {c.border}; margin: 8px 16px;" }
-                    SidebarItem { icon: "archive", label: "Archived", active: matches!(*view.read(), View::Archived), onclick: move |_| { view.set(View::Archived); refresh_notes(&db_side_arch, &View::Archived, &notes, ""); } }
-                    SidebarItem { icon: "delete", label: "Trash", active: matches!(*view.read(), View::Trash), onclick: move |_| { view.set(View::Trash); refresh_notes(&db_side_trash, &View::Trash, &notes, ""); } }
+                    SidebarItem { icon: "archive", label: "Archived", active: matches!(view.read().clone(), View::Archived), onclick: move |_| { view.set(View::Archived); refresh_notes(&db_side_arch, &View::Archived, &notes, ""); } }
+                    SidebarItem { icon: "delete", label: "Trash", active: matches!(view.read().clone(), View::Trash), onclick: move |_| { view.set(View::Trash); refresh_notes(&db_side_trash, &View::Trash, &notes, ""); } }
 
                     // Tags section
                     if selected_id.read().is_some() {
@@ -210,8 +214,31 @@ pub fn Workspace(
                         }
                     }
 
+                    // Calendar panel
+                    if matches!(*view.read(), View::Calendar | View::CalendarDate(_)) {
+                        div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
+                        crate::ui::sidebar::calendar::CalendarPanel {
+                            db: db_tag5.clone(),
+                            on_select_date: move |date_str: String| {
+                                view.set(View::CalendarDate(date_str.clone()));
+                                if let Some(ref d) = db_tag7 {
+                                    let svc = NoteService::new(d);
+                                    let existing = svc.search(&date_str).ok().and_then(|r| r.into_iter().find(|(n, _)| n.title.contains(&date_str)).map(|(n, _)| n));
+                                    if let Some(note) = existing {
+                                        selected_id.set(Some(note.id.clone())); title.set(note.title); content.set(note.content);
+                                        if let Ok(tags) = TagService::new(d).get_tags_for_note(&note.id) { note_tags.set(tags.iter().map(|t2| t2.name.clone()).collect()); }
+                                        if let Ok(h) = HistoryService::new(d).list(&note.id) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); }
+                                    } else if let Ok(note) = svc.create(&date_str, "") {
+                                        selected_id.set(Some(note.id.clone())); title.set(note.title.clone()); content.set(note.content.clone());
+                                        notes.write().insert(0, note);
+                                    }
+                                }
+                            },
+                        }
+                    }
+
                     // Tag tree
-                    if *view.read() == View::AllNotes {
+                    if view.read().clone() == View::AllNotes {
                         div { style: "border-top: 1px solid {c.border}; margin: 8px 16px;" }
                         crate::ui::sidebar::tag_tree::TagTree { db: db_tag5.clone(), on_search_tag: move |tag_name| { query.set(format!("tag:{}", tag_name)); refresh_notes(&db_side_all2, &View::AllNotes, &notes, &format!("tag:{}", tag_name)); } }
                     }
@@ -228,7 +255,7 @@ pub fn Workspace(
             }
 
             // ====== NOTE LIST ======
-            if *view.read() != View::SmartViews {
+            if view.read().clone() != View::SmartViews && !matches!(*view.read(), View::Calendar | View::CalendarDate(_)) {
                 aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
                     div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
                         div { style: "position: relative;",
@@ -247,7 +274,7 @@ pub fn Workspace(
                             let nid1 = note.id.clone(); let nid2 = note.id.clone();
                             let dc1 = di.clone(); let dc2 = di.clone();
                             let dt = db_tag2.clone();
-                            let v = *view.read();
+                            let v = view.read().clone();
                             rsx! {
                                 div { key: "{note.id}", style: "padding: 14px 16px; border-bottom: 1px solid {c.border}; background: {bg}; cursor: pointer; position: relative;",
                                     onclick: move |_| {
@@ -291,7 +318,7 @@ pub fn Workspace(
                             }
                         })}
                         if notes.read().is_empty() {
-                            div { style: "padding: 32px; text-align: center; font-family: Inter; font-size: 13px; color: {c.text_muted};", p { "{get_empty_msg(*view.read())}" } }
+                            div { style: "padding: 32px; text-align: center; font-family: Inter; font-size: 13px; color: {c.text_muted};", p { "{get_empty_msg(&*view.read())}" } }
                         }
                     }
                 }
@@ -305,7 +332,7 @@ pub fn Workspace(
             }
 
             // ====== EDITOR ======
-            if *view.read() != View::SmartViews {
+            if view.read().clone() != View::SmartViews && view.read().clone() != View::Calendar {
                 section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
                     header { style: "height: 56px; background: {c.bg_canvas}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;",
                         div { style: "display: flex; background: {c.bg_surface}; border-radius: 4px; border: 1px solid {c.border}; padding: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px;",
@@ -368,7 +395,7 @@ pub fn Workspace(
                                         placeholder: "Untitled",
                                         style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
                                     }
-                                    if *view.read() == View::Trash {
+                                    if view.read().clone() == View::Trash {
                                         div { style: "padding: 12px; background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; margin-bottom: 16px; display: flex; gap: 8px; align-items: center;",
                                             span { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; flex: 1;", "This note is in the Trash." }
                                             button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; cursor: pointer;",
@@ -400,8 +427,8 @@ pub fn Workspace(
                         }
                         div { style: "display: flex; gap: 16px; color: {c.text_muted};",
                             span { "Words: {content.read().split_whitespace().count()}" }
-                            if *view.read() == View::Trash { span { style: "color: {c.error};", "Trash" } }
-                            if *view.read() == View::Archived { span { style: "color: {c.accent_yellow};", "Archived" } }
+                            if view.read().clone() == View::Trash { span { style: "color: {c.error};", "Trash" } }
+                            if view.read().clone() == View::Archived { span { style: "color: {c.accent_yellow};", "Archived" } }
                         }
                     }
                 }
@@ -410,12 +437,13 @@ pub fn Workspace(
     }
 }
 
-fn get_empty_msg(view: View) -> &'static str {
+fn get_empty_msg(view: &View) -> &'static str {
     match view {
         View::AllNotes => "No notes yet. Create one!",
         View::Archived => "No archived notes",
         View::Trash => "Trash is empty",
         View::SmartViews => "No smart views yet",
+        View::Calendar | View::CalendarDate(_) => "Select a date from the calendar",
     }
 }
 
