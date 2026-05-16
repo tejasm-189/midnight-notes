@@ -94,6 +94,13 @@ pub const FORMAT_ACTIONS: &[FmtAction] = &[
         insert_after: "",
         newline: true,
     },
+    FmtAction {
+        label: "Table",
+        icon: "table_chart",
+        insert_before: "\n| Column 1 | Column 2 |\n| --- | --- |\n|  |  |\n",
+        insert_after: "",
+        newline: true,
+    },
 ];
 
 #[component]

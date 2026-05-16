@@ -14,7 +14,7 @@ Editor components for Prose, Code, and Vim modes, plus slash command palette.
 | `spreadsheet.rs` | ✅ done | Spreadsheet editor (JSON persistence) |
 | `kanban.rs` | ✅ done | Kanban board editor (JSON persistence) |
 | `slash.rs` | ✅ done | Slash command palette (12 commands) |
-| `format_menu.rs` | ✅ done | Context menu for text formatting (bold, italic, etc.) |
+| `format_menu.rs` | ✅ done | Context menu for inserting markdown templates (Table, Code, Checklist, etc.) |
 
 ## Progress
 - [x] Module structure

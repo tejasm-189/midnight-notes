@@ -38,8 +38,9 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
     let mut show_calendar = use_signal(|| false);
     let mut show_settings = use_signal(|| false);
     let mut context_note = use_signal(|| None::<String>);
-    let mut fmt_menu_visible = use_signal(|| false);
-    let fmt_menu_pos = use_signal(|| (0i32, 0i32));
+    let mut show_format_menu = use_signal(|| false);
+    let mut format_menu_pos = use_signal(|| (0i32, 0i32));
+    let mut focus_mode = use_signal(|| false);
 
     let _tag_version = use_signal(|| 0u32);
 
@@ -50,7 +51,6 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
     let db_new = db.clone();
     let db_pin = db.clone();
     let db_arch = db.clone();
-    let db_save = db.clone();
     let db_restore = db.clone();
     let db_del = db.clone();
     let db_side_all = db.clone();
@@ -59,7 +59,6 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
     let db_search = db.clone();
     let db_pin_r = db.clone();
     let db_arch_r = db.clone();
-    let db_save_r = db.clone();
     let db_restore_r = db.clone();
     let db_del_r = db.clone();
     let db_auto = db.clone();
@@ -144,7 +143,8 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
             div { style: "display: flex; height: 100vh; background: {c.bg_primary};",
 
                 // ====== SIDEBAR ======
-                nav { style: "width: 256px; min-width: 256px; border-right: 1px solid {c.border}; background: {c.bg_surface}; display: flex; flex-direction: column; padding: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px;",
+                if !*focus_mode.read() {
+                    nav { style: "width: 256px; min-width: 256px; border-right: 1px solid {c.border}; background: {c.bg_surface}; display: flex; flex-direction: column; padding: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px;",
                     div { style: "padding: 0 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;",
                         span { class: "material-symbols-outlined fill", style: "font-size: 28px; color: {c.accent};", "description" }
                         div { h1 { style: "font-family: Inter; font-size: 20px; font-weight: 600; color: {c.accent};", "Midnight Notes" } p { style: "font-size: 11px; color: {c.accent_green};", "Local-first Sync" } }
@@ -278,7 +278,7 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                         db: db.clone(),
                     }
                 // ====== NOTE LIST ======
-                } else if view.read().clone() != View::SmartViews {
+                } else if view.read().clone() != View::SmartViews && !*focus_mode.read() {
                     aside { style: "width: 320px; min-width: 320px; border-right: 1px solid {c.border}; background: {c.bg_canvas}; display: flex; flex-direction: column;",
                         div { style: "padding: 12px 16px; border-bottom: 1px solid {c.border};",
                             div { style: "position: relative;",
@@ -386,41 +386,41 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                 // ====== EDITOR ======
                 if !*show_settings.read() && view.read().clone() != View::SmartViews {
                     section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
-                        header { style: "height: 56px; background: {c.bg_canvas}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;",
-                            div { style: "display: flex; background: {c.bg_surface}; border-radius: 4px; border: 1px solid {c.border}; padding: 2px; font-family: 'JetBrains Mono', monospace; font-size: 11px;",
-                                ModeBtn { label: "Prose", active: mode() == "Prose", onclick: move |_| mode.set("Prose") }
-                                ModeBtn { label: "Code", active: mode() == "Code", onclick: move |_| mode.set("Code") }
-                                ModeBtn { label: "Vim", active: mode() == "Vim", onclick: move |_| mode.set("Vim") }
-                                ModeBtn { label: "Sheet", active: mode() == "Sheet", onclick: move |_| mode.set("Sheet") }
-                                ModeBtn { label: "Board", active: mode() == "Board", onclick: move |_| mode.set("Board") }
+                        header { style: "height: 56px; background: transparent; border: none; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;",
+                            button { style: "color: {c.text_muted}; background: none; border: none; padding: 4px; cursor: pointer;",
+                                onclick: move |_| focus_mode.set(!focus_mode()),
+                                span { class: "material-symbols-outlined", style: "font-size: 20px;",
+                                    if *focus_mode.read() { "side_navigation" } else { "fullscreen" }
+                                }
                             }
-                            div { style: "display: flex; align-items: center; gap: 6px;",
-                                span { style: "display: flex; align-items: center; gap: 4px; font-size: 10px; color: {c.accent_green}; background: {c.bg_surface_high}; padding: 4px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;",
-                                    span { class: "material-symbols-outlined", style: "font-size: 12px;", "lock" } "Encrypted"
+                            div { style: "display: flex; align-items: center; gap: 16px;",
+                                span { style: "display: flex; align-items: center; gap: 4px; font-size: 11px; color: {c.text_muted}; font-family: Inter;",
+                                    span { class: "material-symbols-outlined", style: "font-size: 14px; color: {c.accent_green};", "lock" } "Protected"
                                 }
-                                button { style: "color: {c.accent}; background: none; border: none; padding: 4px; cursor: pointer;",
+                                button { style: "color: {c.text_muted}; background: none; border: none; padding: 4px; cursor: pointer; transition: color 0.2s;",
+                                    onmouseover: move |_| {}, // I'll add hover styling via CSS or inline
                                     onclick: move |_| { if let Some(ref d) = db_pin { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_pin(&id); refresh_notes(&db_pin_r, &view.read(), &notes, ""); } } },
-                                    span { class: "material-symbols-outlined", style: "font-size: 18px;", "push_pin" }
+                                    span { class: "material-symbols-outlined", style: "font-size: 20px;", "push_pin" }
                                 }
-                                button { style: "color: {c.text_secondary}; background: none; border: none; padding: 4px; cursor: pointer;",
+                                button { style: "color: {c.text_muted}; background: none; border: none; padding: 4px; cursor: pointer;",
                                     onclick: move |_| { if let Some(ref d) = db_arch { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_archive(&id); selected_id.set(None); title.set(String::new()); content.set(String::new()); refresh_notes(&db_arch_r, &view.read(), &notes, ""); } } },
-                                    span { class: "material-symbols-outlined", style: "font-size: 18px;", "archive" }
+                                    span { class: "material-symbols-outlined", style: "font-size: 20px;", "archive" }
                                 }
-                                // History button
-                                button { style: "color: {c.text_secondary}; background: none; border: none; padding: 4px; cursor: pointer;",
+                                button { style: "color: {c.text_muted}; background: none; border: none; padding: 4px; cursor: pointer;",
                                     onclick: move |_| { let cur = *show_snapshots.read(); show_snapshots.set(!cur); },
-                                    span { class: "material-symbols-outlined", style: "font-size: 18px;", "history" }
-                                }
-                                button { style: "background: {c.accent}; color: {c.bg_primary}; border: none; border-radius: 4px; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer;",
-                                    onclick: move |_| { if let Some(ref d) = db_save { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).update(&id, &title.read(), &content.read()); refresh_notes(&db_save_r, &view.read(), &notes, ""); } } },
-                                    "Save"
+                                    span { class: "material-symbols-outlined", style: "font-size: 20px;", "history" }
                                 }
                             }
                         }
 
                         if selected_id.read().is_some() {
                             div { style: "flex: 1; overflow-y: auto; display: flex; justify-content: center; background: {c.bg_primary};",
-                                div { style: "width: 100%; max-width: 840px; padding: 64px 40px; display: flex; flex-direction: column; gap: 0;",
+                                oncontextmenu: move |e| {
+                                    e.prevent_default();
+                                    format_menu_pos.set((e.page_coordinates().x as i32, e.page_coordinates().y as i32));
+                                    show_format_menu.set(true);
+                                },
+                                div { style: "width: 100%; padding: 64px 80px; display: flex; flex-direction: column; gap: 0;",
                                     div { style: "width: 100%;",
                                         // Version history panel
                                         if *show_snapshots.read() {
@@ -509,6 +509,17 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         }
                                     }
                                 }
+                                crate::ui::editor::format_menu::FormatMenu {
+                                    visible: *show_format_menu.read(),
+                                    x: format_menu_pos.read().0,
+                                    y: format_menu_pos.read().1,
+                                    on_close: move |_| show_format_menu.set(false),
+                                    on_insert: move |ins: String| {
+                                        let cur = content.read().clone();
+                                        content.set(format!("{}\n{}", cur, ins));
+                                        show_format_menu.set(false);
+                                    }
+                                }
                             }
                         } else {
                             div { style: "flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;",
@@ -528,17 +539,6 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                             }
                         }
                     }
-                // Formatting context menu for editor
-                crate::ui::editor::format_menu::FormatMenu {
-                    visible: *fmt_menu_visible.read(),
-                    on_close: move |_| fmt_menu_visible.set(false),
-                    on_insert: move |text| {
-                        let sel = content.read().clone();
-                        content.set(format!("{}{}", sel, text));
-                        fmt_menu_visible.set(false);
-                    },
-                    x: fmt_menu_pos.read().0,
-                    y: fmt_menu_pos.read().1,
                 }
             }
         }
