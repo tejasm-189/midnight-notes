@@ -17,15 +17,13 @@ pub fn ProseEditor(content: String, oninput: EventHandler<String>) -> Element {
                 if *show_preview.read() { "Hide Preview" } else { "Show Preview" }
             }
             div { style: "flex: 1; display: flex; gap: 16px; min-height: 0; overflow: hidden;",
-                if !*show_preview.read() || content.is_empty() {
-                    textarea {
-                        value: "{content}",
-                        oninput: move |e| oninput.call(e.value()),
-                        placeholder: "Start writing...",
-                        style: "flex: 1; background: transparent; border: none; color: {c.text_primary};
-                                font-family: Inter; font-size: 16px; line-height: 1.7; resize: none;
-                                outline: none; padding: 0; min-height: 300px;",
-                    }
+                textarea {
+                    value: "{content}",
+                    oninput: move |e| oninput.call(e.value()),
+                    placeholder: "Start writing...",
+                    style: "flex: 1; background: transparent; border: none; color: {c.text_primary};
+                            font-family: Inter; font-size: 16px; line-height: 1.7; resize: none;
+                            outline: none; padding: 0; min-height: 300px;",
                 }
                 if *show_preview.read() && !content.is_empty() {
                     div {

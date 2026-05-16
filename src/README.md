@@ -14,7 +14,7 @@ All application source code. Settings inline in workspace. Editors enhanced with
 
 | Folder | Status | Description |
 |--------|--------|-------------|
-| `ui/` | ✅ done | Dioxus frontend: workspace, settings, vault lock, editors, shared SidebarItem, enhanced templates |
+| `ui/` | ✅ done | Dioxus frontend: workspace, settings, vault lock, editors (always editable), shared SidebarItem, enhanced templates |
 | `core/` | ✅ done | Business logic: notes, tags, search, backlinks, history, export, markdown, plugins, watcher |
 | `storage/` | ✅ done | SQLite persistence: database, migrations, models, attachments |
 | `crypto/` | ✅ done | Encryption: Argon2id, XChaCha20-Poly1305, AES-256-GCM |

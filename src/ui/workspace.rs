@@ -461,11 +461,19 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         }
                                         // Mode-aware editor
                                         if mode() == "Prose" {
+                                            input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
+                                                placeholder: "Untitled",
+                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                                            }
                                             crate::ui::editor::prose::ProseEditor {
                                                 content: content.read().clone(),
                                                 oninput: move |c| content.set(c),
                                             }
                                         } else if mode() == "Code" {
+                                            input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
+                                                placeholder: "Untitled",
+                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                                            }
                                             crate::ui::editor::code::CodeEditor {
                                                 content: content.read().clone(),
                                                 oninput: move |c| content.set(c),
