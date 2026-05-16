@@ -41,3 +41,6 @@ No unit tests added.
 | `code_query_matches_code_block_command` | `code` matches "Code Block" |
 | `unknown_query_returns_empty_results` | Unknown query returns empty |
 | `exact_trigger_match_finds_command` | Exact trigger match works |
+
+## format_menu.rs
+No unit tests (UI component). Visual verification: context menu opens, formatting options (bold, italic) insert correct markdown.

@@ -41,7 +41,7 @@ pub fn SpreadsheetEditor(
                     thead {
                         tr {
                             th { style: "width: 40px; background: {c.bg_canvas}; border-right: 1px solid {c.border}; border-bottom: 1px solid {c.border};" }
-                            for i in 0..data.read().rows.get(0).map(|r| r.len()).unwrap_or(0) {
+                            for i in 0..data.read().rows.first().map(|r| r.len()).unwrap_or(0) {
                                 th {
                                     key: "{i}",
                                     style: "padding: 8px; background: {c.bg_canvas}; border-right: 1px solid {c.border}; border-bottom: 1px solid {c.border}; color: {c.text_muted}; font-weight: 500;",
@@ -84,7 +84,7 @@ pub fn SpreadsheetEditor(
                     style: "background: {c.bg_surface_high}; color: {c.text_primary}; border: 1px solid {c.border}; border-radius: 4px; padding: 6px 12px; font-size: 11px; cursor: pointer;",
                     onclick: move |_| {
                         let mut d = data.write();
-                        let col_count = d.rows.get(0).map(|r| r.len()).unwrap_or(5);
+                        let col_count = d.rows.first().map(|r| r.len()).unwrap_or(5);
                         d.rows.push(vec![String::new(); col_count]);
                         save(d.clone());
                     },

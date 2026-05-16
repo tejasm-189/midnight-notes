@@ -10,10 +10,10 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 | `mod.rs` | ✅ done | Module root, re-exports |
 | `app.rs` | ✅ done | Root component with screen routing (VaultLock / Workspace) — Settings now inline in workspace |
 | `vault_lock.rs` | ✅ done | Vault unlock screen (biometric + master password) |
-| `workspace.rs` | ✅ done | Main workspace: sidebar, note list with tag chips + context menu, editor (ProseEditor/CodeEditor/Vim modes), auto-save, calendar toggle |
+| `workspace.rs` | ✅ done | Main workspace: sidebar, note list with tag chips + context menu, editor (ProseEditor/CodeEditor/Vim modes), auto-save, view navigation, calendar toggle |
 | `viewer.rs` | ✅ done | Read-only note viewer with markdown rendering |
 | `smart_view.rs` | ✅ done | Smart Views screen: FTS5 search, results grid, linked graph |
-| `settings.rs` | ✅ done | Settings panel (inline in workspace), theme switcher (Midnight/Dark/Light) |
+| `settings.rs` | ✅ done | Enhanced Settings page with sidebar, encryption controls, and theme cards |
 | `theme.rs` | ✅ done | Theme provider system, ThemeColors struct, 3 themes |
 
 ## Sub-folders
@@ -40,3 +40,4 @@ All Dioxus components for the user interface. Organized by feature/screen. No bu
 ## Notes
 - Follow the Midnight design system in `DESIGN.md`
 - Reference HTML mockups in `docs/Design/`
+
