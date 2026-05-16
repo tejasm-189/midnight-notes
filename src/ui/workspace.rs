@@ -171,7 +171,7 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                     if let Ok(h) = HistoryService::new(d).list(&note.id) { snapshots.set(h.iter().map(|s| (s.id.clone(), s.created_at.format("%b %d %H:%M").to_string())).collect()); }
                                 } else {
                                     let date_fmt = chrono::Utc::now().format("%a %d %b %Y").to_string();
-                                    let template = format!("# Daily Note — {}\n\n## Tasks\n- [ ] \n\n## Notes\n\n## Meetings\n\n", date_fmt);
+                                    let template = format!("# 🗓️ Daily Note — {}\n\n## ⚡️ Top Priority\n- [ ] \n\n## 📅 Schedule & Meetings\n- \n\n## 🛠️ Work Log\n- \n\n## ✅ Tasks\n- [ ] \n\n## 🧠 Brain Dump\n", date_fmt);
                                     if let Ok(note) = note_svc.create(&today, &template) {
                                         title.set(note.title.clone()); content.set(note.content.clone()); selected_id.set(Some(note.id.clone()));
                                         notes.write().insert(0, note);
@@ -246,7 +246,7 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         } else {
                                             let parsed = chrono::NaiveDate::parse_from_str(&date_str, "%Y-%m-%d").ok();
                                             let date_fmt = parsed.map(|d| d.format("%a %d %b %Y").to_string()).unwrap_or_else(|| date_str.clone());
-                                            let template = format!("# Daily Note — {}\n\n## Tasks\n- [ ] \n\n## Notes\n\n## Meetings\n\n", date_fmt);
+                                            let template = format!("# 🗓️ Daily Note — {}\n\n## ⚡️ Top Priority\n- [ ] \n\n## 📅 Schedule & Meetings\n- \n\n## 🛠️ Work Log\n- \n\n## ✅ Tasks\n- [ ] \n\n## 🧠 Brain Dump\n", date_fmt);
                                             if let Ok(note) = svc.create(&date_str, &template) {
                                                 selected_id.set(Some(note.id.clone())); title.set(note.title.clone()); content.set(note.content.clone());
                                                 notes.write().insert(0, note);

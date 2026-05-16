@@ -17,7 +17,7 @@ UI components are tested via visual inspection. Key flows to verify:
 | Workspace | Note list, Prose/Code/Sheet/Board editors, Vim mode, auto-save, pin, archive, trash, context menu (⋮), tag chip filtering, persistent tag tree |
 | Settings | Sidebar nav, encryption (Key Mgmt/Argon2), theme cards, sync paths, biometric toggle |
 | Smart Views | Search query, results, linked graph |
-| Calendar | Month navigation, date selection, daily note creation, view transition from Smart Views, date format |
+| Calendar | Month navigation, date selection, daily note creation (enhanced template), view transition from Smart Views, date format |
 
 ## Running
 ```bash
