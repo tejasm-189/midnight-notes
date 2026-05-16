@@ -419,12 +419,9 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                         }
 
                         if selected_id.read().is_some() {
-                            div { style: "flex: 1; overflow-y: auto; display: flex; justify-content: center;",
-                                div { style: "width: 100%; max-width: 1200px; padding: 24px 40px; position: relative;",
-                                    div { style: "position: absolute; left: 0; top: 0; bottom: 0; width: 32px; border-right: 1px solid {c.border}; display: flex; flex-direction: column; align-items: flex-end; padding: 24px 8px 24px 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: {c.border}; opacity: 0.3; user-select: none;",
-                                        { (1..=30).map(|i| rsx! { span { "{i}" } }) }
-                                    }
-                                    div { style: "padding-left: 48px;",
+                            div { style: "flex: 1; overflow-y: auto; display: flex; justify-content: center; background: {c.bg_primary};",
+                                div { style: "width: 100%; max-width: 840px; padding: 64px 40px; display: flex; flex-direction: column; gap: 0;",
+                                    div { style: "width: 100%;",
                                         // Version history panel
                                         if *show_snapshots.read() {
                                             div { style: "background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; padding: 12px; margin-bottom: 16px;",
@@ -463,8 +460,9 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         if mode() == "Prose" {
                                             input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
                                                 placeholder: "Untitled",
-                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 40px; font-weight: 800; letter-spacing: -0.04em; color: {c.text_primary}; margin-bottom: 8px; outline: none; padding: 0;",
                                             }
+                                            div { style: "height: 1px; width: 40px; background: {c.border}; margin-bottom: 32px;" }
                                             crate::ui::editor::prose::ProseEditor {
                                                 content: content.read().clone(),
                                                 oninput: move |c| content.set(c),
@@ -472,8 +470,9 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         } else if mode() == "Code" {
                                             input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
                                                 placeholder: "Untitled",
-                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 40px; font-weight: 800; letter-spacing: -0.04em; color: {c.text_primary}; margin-bottom: 8px; outline: none; padding: 0;",
                                             }
+                                            div { style: "height: 1px; width: 40px; background: {c.border}; margin-bottom: 32px;" }
                                             crate::ui::editor::code::CodeEditor {
                                                 content: content.read().clone(),
                                                 oninput: move |c| content.set(c),
@@ -496,8 +495,9 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                             // Vim mode: title input + textarea + status bar
                                             input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
                                                 placeholder: "Untitled",
-                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: {c.text_primary}; margin-bottom: 24px; outline: none;",
+                                                style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 40px; font-weight: 800; letter-spacing: -0.04em; color: {c.text_primary}; margin-bottom: 8px; outline: none; padding: 0;",
                                             }
+                                            div { style: "height: 1px; width: 40px; background: {c.border}; margin-bottom: 32px;" }
                                             textarea { value: "{content}", oninput: move |e| content.set(e.value()),
                                                 spellcheck: false,
                                                 style: "width: 100%; min-height: 60vh; background: transparent; border: none; color: {c.text_primary}; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; resize: none; outline: none; tab-size: 2;",

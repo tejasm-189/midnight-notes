@@ -8,7 +8,7 @@ Editor components for Prose, Code, and Vim modes, plus slash command palette.
 | File | Status | Description |
 |------|--------|-------------|
 | `mod.rs` | ✅ done | Module root |
-| `prose.rs` | ✅ done | Markdown editing with split preview (theme-aware, always editable) |
+| `prose.rs` | ✅ done | Markdown editing with seamless Apple-inspired layout (theme-aware, always editable) |
 | `code.rs` | ✅ done | Code editing with monospace font, theme-aware background |
 | `vim.rs` | ✅ done | Vim mode state machine (normal/insert/visual/command) |
 | `spreadsheet.rs` | ✅ done | Spreadsheet editor (JSON persistence) |

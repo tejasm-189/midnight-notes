@@ -1,7 +1,7 @@
 # Tests — src/ui/editor/
 
 ## prose.rs / code.rs
-No unit tests (UI components). Updated to use theme colors, removed duplicate title inputs. Prose editor now uses a split-view layout to ensure content is always editable.
+No unit tests (UI components). Updated to use theme colors, removed duplicate title inputs. Prose editor now uses a seamless Apple-inspired layout for a focused writing experience.
 
 ## spreadsheet.rs / kanban.rs
 Now use theme colors, full-height layout.
