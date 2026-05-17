@@ -23,8 +23,15 @@ pub fn render_markdown(text: &str) -> String {
 }
 
 /// Extract plain text summary from markdown (for preview snippets).
+/// Strip HTML tags from text using regex.
+pub fn strip_html(text: &str) -> String {
+    let re = regex::Regex::new(r"<[^>]*>").unwrap();
+    re.replace_all(text, "").to_string()
+}
+
 pub fn plain_text_summary(text: &str, max_chars: usize) -> String {
-    let parser = Parser::new(text);
+    let clean = strip_html(text);
+    let parser = Parser::new(&clean);
     let mut out = String::new();
     for event in parser {
         match event {
@@ -41,6 +48,13 @@ pub fn plain_text_summary(text: &str, max_chars: usize) -> String {
             }
             _ => {}
         }
+    }
+    if out.is_empty() && !clean.is_empty() {
+        let truncated: String = clean.chars().take(max_chars).collect();
+        if truncated.len() < clean.len() {
+            return format!("{}…", truncated);
+        }
+        return truncated;
     }
     out
 }

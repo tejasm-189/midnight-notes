@@ -5,6 +5,7 @@ pub mod markdown;
 pub mod note;
 pub mod plugin;
 pub mod search;
+pub mod seeder;
 pub mod tag;
 pub mod watcher;
 

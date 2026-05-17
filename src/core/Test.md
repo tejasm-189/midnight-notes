@@ -73,7 +73,7 @@
 | `wrong_password_fails_import` | Wrong password fails import |
 | `exporting_with_no_notes_still_works` | Export with no notes still works |
 
-## markdown.rs (11 tests)
+## markdown.rs (12 tests)
 | Test | What it verifies |
 |------|-----------------|
 | `rendering_bold_markdown_produces_strong_tag` | Bold markdown renders as `<strong>` |
@@ -87,7 +87,7 @@
 | `plain_text_returns_false_for_math_check` | Plain text returns false |
 | `extracting_wiki_links_from_markdown_works` | `[[Title]]` extracted from markdown |
 | `rendering_code_block_produces_code_tag` | Code blocks render with `<code>` |
-| `rendering_strikethrough_produces_del_tag` | `~~text~~` renders as `<del>` |
+| `rendering_strikethrough_produces_del_tag` | `~~text~~` renders as `<del>` strikethrough |
 
 ## plugin/host.rs (3 tests)
 | Test | What it verifies |

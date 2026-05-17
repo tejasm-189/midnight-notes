@@ -14,18 +14,18 @@ All application source code. Settings inline in workspace. Editors enhanced with
 
 | Folder | Status | Description |
 |--------|--------|-------------|
-| `ui/` | ✅ done | Dioxus frontend: workspace, settings, vault lock, seamless editors (Apple-inspired), shared SidebarItem, enhanced templates |
-| `core/` | ✅ done | Business logic: notes, tags, search, backlinks, history, export, markdown, plugins, watcher |
+| `ui/` | ✅ done | Dioxus frontend: workspace, settings, vault lock, seamless editors (Apple-inspired WYSIWYG RichText), shared SidebarItem, enhanced templates |
+| `core/` | ✅ done | Business logic: notes seeder, tags, search, backlinks, history, export, markdown, plugins, watcher |
 | `storage/` | ✅ done | SQLite persistence: database, migrations, models, attachments |
 | `crypto/` | ✅ done | Encryption: Argon2id, XChaCha20-Poly1305, AES-256-GCM |
 
 ## Progress
 - [x] Project scaffold
 - [x] Module structure
+- [x] WYSIWYG RichText note editor + workspace header toolbar
+- [x] Settings Keyboard Hotkeys panel
+- [x] Clean database seeder
 - [x] 114 tests (101 unit + 11 integration + 2 doc)
 
 ## Notes
 - No file in `src/` should import Dioxus directly (UI layer only)
-
-
-

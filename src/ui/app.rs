@@ -52,6 +52,7 @@ pub fn App() -> Element {
 
                             match Database::open(&db_path) {
                                 Ok(database) => {
+                                    crate::core::seeder::seed_database(&database);
                                     let shared = Arc::new(database);
                                     db.set(Some(shared));
                                     screen.set(Screen::Workspace);

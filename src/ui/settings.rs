@@ -20,7 +20,7 @@ pub fn Settings(db: Option<SharedDb>) -> Element {
             // Integrated Header (Minimalist)
             div { style: "padding: 32px 40px; border-bottom: 1px solid {c.border}; background: {c.bg_primary};",
                 h1 { style: "font-family: Inter; font-size: 28px; font-weight: 700; color: {c.text_primary}; letter-spacing: -0.02em;", "Settings & Security" }
-                p { style: "font-family: Inter; font-size: 14px; color: {c.text_secondary}; margin-top: 4px;", "Manage your vault encryption, appearance, and local storage." }
+                p { style: "font-family: Inter; font-size: 14px; color: {c.text_secondary}; margin-top: 4px;", "Manage your vault encryption, appearance, and keyboard hotkeys." }
             }
 
             // Sections List (Centered to match Editor)
@@ -54,6 +54,53 @@ pub fn Settings(db: Option<SharedDb>) -> Element {
                             ThemeCard { t: Theme::Light, active: *theme_light.read() == Theme::Light, c: c, onclick: move |_| { theme_light.set(Theme::Light); save_theme(&db_light, Theme::Light); } }
                             ThemeCard { t: Theme::Dark, active: *theme_dark.read() == Theme::Dark, c: c, onclick: move |_| { theme_dark.set(Theme::Dark); save_theme(&db_dark, Theme::Dark); } }
                             ThemeCard { t: Theme::Midnight, active: *theme_mid.read() == Theme::Midnight, c: c, onclick: move |_| { theme_mid.set(Theme::Midnight); save_theme(&db_mid, Theme::Midnight); } }
+                        }
+                    }
+                }
+
+                // Keyboard Hotkeys Section
+                SettingsSection { icon: "keyboard", title: "Keyboard Hotkeys", c: c,
+                    div { style: "background: {c.bg_surface}; border: 1px solid {c.border}; border-radius: 4px; overflow: hidden;",
+                        SettingsHotkeyItem {
+                            action: "Format Bold",
+                            shortcut: "Ctrl + B",
+                            desc: "Apply bold formatting to selected text in the note editor.",
+                            c: c
+                        }
+                        div { style: "height: 1px; background: {c.border};" }
+                        SettingsHotkeyItem {
+                            action: "Format Italic",
+                            shortcut: "Ctrl + I",
+                            desc: "Apply italic emphasis to selected text in the note editor.",
+                            c: c
+                        }
+                        div { style: "height: 1px; background: {c.border};" }
+                        SettingsHotkeyItem {
+                            action: "Format Underline",
+                            shortcut: "Ctrl + U",
+                            desc: "Apply underline style to selected text in the note editor.",
+                            c: c
+                        }
+                        div { style: "height: 1px; background: {c.border};" }
+                        SettingsHotkeyItem {
+                            action: "Code Block Escape",
+                            shortcut: "Ctrl + Enter",
+                            desc: "Exit out of a code block to start a new paragraph below it.",
+                            c: c
+                        }
+                        div { style: "height: 1px; background: {c.border};" }
+                        SettingsHotkeyItem {
+                            action: "Checklist Exit",
+                            shortcut: "Double Enter",
+                            desc: "Press Enter on an empty checklist item to exit list formatting.",
+                            c: c
+                        }
+                        div { style: "height: 1px; background: {c.border};" }
+                        SettingsHotkeyItem {
+                            action: "Quote Block Exit",
+                            shortcut: "Double Enter",
+                            desc: "Press Enter on an empty blockquote line to break out to normal text.",
+                            c: c
                         }
                     }
                 }
@@ -122,6 +169,30 @@ fn SettingsItem(title: String, desc: String, c: ThemeColors, children: Element) 
                 p { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; margin-top: 2px;", "{desc}" }
             }
             {children}
+        }
+    }
+}
+
+#[component]
+fn SettingsHotkeyItem(action: String, shortcut: String, desc: String, c: ThemeColors) -> Element {
+    rsx! {
+        div {
+            style: "padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: {c.bg_surface_low};",
+            div { style: "flex: 1;",
+                h4 { style: "font-family: Inter; font-size: 14px; font-weight: 600; color: {c.text_primary};", "{action}" }
+                p { style: "font-family: Inter; font-size: 12px; color: {c.text_secondary}; margin-top: 2px;", "{desc}" }
+            }
+            div { style: "display: flex; gap: 6px; align-items: center;",
+                {shortcut.split(" + ").map(|part| {
+                    rsx! {
+                        kbd {
+                            key: "{part}",
+                            style: "font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: {c.accent}; background: {c.bg_canvas}; border: 1px solid {c.border}; padding: 4px 8px; border-radius: 4px; box-shadow: 0 2px 0 {c.border}; text-transform: uppercase;",
+                            "{part}"
+                        }
+                    }
+                })}
+            }
         }
     }
 }

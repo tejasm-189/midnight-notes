@@ -1,9 +1,11 @@
 #![allow(clippy::possible_missing_else)]
+use dioxus::prelude::document::eval;
 use dioxus::prelude::*;
 use std::time::Duration;
 
 use crate::core::export::ExportService;
 use crate::core::history::HistoryService;
+use crate::core::markdown;
 use crate::core::note::NoteService;
 use crate::core::search::SearchService;
 use crate::core::tag::TagService;
@@ -19,11 +21,30 @@ enum View {
     SmartViews,
 }
 
+const TOOLBAR_BTNS: &[(&str, &str, &str)] = &[
+    ("B", "bold", "null"),
+    ("I", "italic", "null"),
+    ("U", "underline", "null"),
+    ("|", "", ""),
+    ("H1", "formatBlock", "'<h1>'"),
+    ("H2", "formatBlock", "'<h2>'"),
+    ("H3", "formatBlock", "'<h3>'"),
+    ("|", "", ""),
+    ("•", "insertUnorderedList", "null"),
+    ("1.", "insertOrderedList", "null"),
+    ("☑", "insertTaskList", "null"),
+    ("\"", "formatBlock", "'<blockquote>'"),
+    ("|", "", ""),
+    ("</>", "formatBlock", "'<pre>'"),
+    ("—", "insertHorizontalRule", "null"),
+    ("⊞", "insertHTML", "'<table style=\"width:100%; border-collapse:collapse; margin:16px 0;\"><thead><tr><th style=\"border:1px solid var(--border); padding:8px;\">Header 1</th><th style=\"border:1px solid var(--border); padding:8px;\">Header 2</th></tr></thead><tbody><tr><td style=\"border:1px solid var(--border); padding:8px;\">Cell 1</td><td style=\"border:1px solid var(--border); padding:8px;\">Cell 2</td></tr></tbody></table>'"),
+];
+
 #[component]
 pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
     let c = use_theme_colors();
     let mut view = use_signal(|| View::AllNotes);
-    let mode = use_signal(|| "Prose");
+    let mut mode = use_signal(|| "RichText");
     let mut notes = use_signal(Vec::<Note>::new);
     let mut selected_id = use_signal(|| None::<String>);
     let mut title = use_signal(String::new);
@@ -313,7 +334,7 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         if note.is_pinned { span { class: "material-symbols-outlined fill", style: "font-size: 14px; color: {c.accent};", "push_pin" } }
                                     }
                                     p { style: "font-family: Inter; font-size: 13px; color: {c.text_secondary}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px;",
-                                        if note.content.is_empty() { "Empty note" } else { "{&note.content}" }
+                                        if note.content.is_empty() { "Empty note" } else { "{markdown::plain_text_summary(&note.content, 120)}" }
                                     }
                                     // Tags on card — clickable to filter
                                     {let cache = note_tag_cache.read().get(&note.id).cloned().unwrap_or_default();
@@ -384,36 +405,64 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
             // ====== EDITOR ======
             if !*show_settings.read() && view.read().clone() != View::SmartViews {
                 section { style: "flex: 1; display: flex; flex-direction: column; min-width: 0; background: {c.bg_primary};",
-                    header { style: "height: 56px; background: transparent; border: none; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px;",
-                        div { style: "display: flex; align-items: center; gap: 16px;",
-                            span { style: "display: flex; align-items: center; gap: 4px; font-size: 11px; color: {c.text_muted}; font-family: Inter;",
-                                span { class: "material-symbols-outlined", style: "font-size: 14px; color: {c.accent_green};", "lock" } "Protected"
+                    header { style: "height: 64px; background: {c.bg_surface_low}; border-bottom: 1px solid {c.border}; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; gap: 16px;",
+                        div { style: "display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1; scrollbar-width: none; -ms-overflow-style: none;",
+                            if selected_id.read().is_some() && mode() == "RichText" {
+                                div { style: "display: flex; align-items: center; gap: 4px;",
+                                    {TOOLBAR_BTNS.iter().enumerate().map(|(i, (label, cmd, val))| {
+                                        if *label == "|" {
+                                            rsx! { div { key: "sep-{i}", class: "toolbar-divider" } }
+                                        } else {
+                                            let label = *label;
+                                            let cmd = *cmd;
+                                            let val = *val;
+                                            rsx! {
+                                                button {
+                                                    key: "tb-{i}",
+                                                    class: "toolbar-btn",
+                                                    title: "{cmd}",
+                                                    "data-val": "{val}",
+                                                    onmousedown: move |e| {
+                                                        e.prevent_default();
+                                                        let eval_str = format!("window.executeEditorCommand('{}', {});", cmd, val);
+                                                        let _ = eval(&eval_str);
+                                                    },
+                                                    span { "{label}" }
+                                                }
+                                            }
+                                        }
+                                    })}
+                                }
                             }
-                            button { style: "color: {c.text_muted}; background: none; border: none; padding: 4px; cursor: pointer; transition: color 0.2s;",
-                                onmouseover: move |_| {}, // I'll add hover styling via CSS or inline
+                        }
+                        div { style: "display: flex; align-items: center; gap: 10px;",
+                            span { style: "display: flex; align-items: center; gap: 6px; font-size: 11px; color: {c.accent_green}; font-family: 'JetBrains Mono', monospace; background: {c.bg_surface}; border: 1px solid {c.border}; border-radius: 999px; padding: 4px 10px;",
+                                span { class: "material-symbols-outlined", style: "font-size: 14px;", "lock" } "Encrypted"
+                            }
+                            button { style: "color: {c.text_muted}; background: {c.bg_surface}; border: 1px solid {c.border}; border-radius: 6px; padding: 6px; cursor: pointer;",
                                 onclick: move |_| { if let Some(ref d) = db_pin { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_pin(&id); refresh_notes(&db_pin_r, &view.read(), &notes, ""); } } },
-                                span { class: "material-symbols-outlined", style: "font-size: 20px;", "push_pin" }
+                                span { class: "material-symbols-outlined", style: "font-size: 18px;", "push_pin" }
                             }
-                            button { style: "color: {c.text_muted}; background: none; border: none; padding: 4px; cursor: pointer;",
+                            button { style: "color: {c.text_muted}; background: {c.bg_surface}; border: 1px solid {c.border}; border-radius: 6px; padding: 6px; cursor: pointer;",
                                 onclick: move |_| { if let Some(ref d) = db_arch { let id = selected_id.read().clone(); if let Some(id) = id { let _ = NoteService::new(d).toggle_archive(&id); selected_id.set(None); title.set(String::new()); content.set(String::new()); refresh_notes(&db_arch_r, &view.read(), &notes, ""); } } },
-                                span { class: "material-symbols-outlined", style: "font-size: 20px;", "archive" }
+                                span { class: "material-symbols-outlined", style: "font-size: 18px;", "archive" }
                             }
-                            button { style: "color: {c.text_muted}; background: none; border: none; padding: 4px; cursor: pointer;",
+                            button { style: "color: {c.text_muted}; background: {c.bg_surface}; border: 1px solid {c.border}; border-radius: 6px; padding: 6px; cursor: pointer;",
                                 onclick: move |_| { let cur = *show_snapshots.read(); show_snapshots.set(!cur); },
-                                span { class: "material-symbols-outlined", style: "font-size: 20px;", "history" }
+                                span { class: "material-symbols-outlined", style: "font-size: 18px;", "history" }
                             }
                         }
                     }
 
                     if selected_id.read().is_some() {
-                        div { style: "flex: 1; overflow-y: auto; display: flex; justify-content: center; background: {c.bg_primary};",
+                        div { style: "flex: 1; overflow-y: auto; display: flex; justify-content: center; background: {c.bg_primary}; padding: 24px 0 32px;",
                             oncontextmenu: move |e| {
                                 e.prevent_default();
                                 format_menu_pos.set((e.page_coordinates().x as i32, e.page_coordinates().y as i32));
                                 show_format_menu.set(true);
                             },
-                            div { style: "width: 100%; padding: 40px; display: flex; flex-direction: column; gap: 0;",
-                                div { style: "width: 100%;",
+                            div { style: "width: 100%; max-width: 900px; min-height: 100%; padding: 0 32px; display: flex; flex-direction: column; gap: 0;",
+                                div { style: "width: 100%; flex: 1; display: flex; flex-direction: column;",
                                     // Version history panel
                                     if *show_snapshots.read() {
                                         div { style: "background: {c.bg_surface_container}; border: 1px solid {c.border}; border-radius: 4px; padding: 12px; margin-bottom: 16px;",
@@ -449,13 +498,14 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         }
                                     }
                                     // Mode-aware editor
-                                    if mode() == "Prose" {
+                                    if mode() == "RichText" {
                                         input { r#type: "text", value: "{title}", oninput: move |e| { let v = e.value(); if v.trim().is_empty() { title.set(String::new()); } else { title.set(v); } },
                                             placeholder: "Untitled",
                                             style: "width: 100%; background: transparent; border: none; font-family: Inter; font-size: 40px; font-weight: 800; letter-spacing: -0.04em; color: {c.text_primary}; margin-bottom: 8px; outline: none; padding: 0;",
                                         }
                                         div { style: "height: 1px; width: 40px; background: {c.border}; margin-bottom: 32px;" }
-                                        crate::ui::editor::prose::ProseEditor {
+                                        crate::ui::editor::richtext::RichTextEditor {
+                                            note_id: selected_id.read().clone().unwrap_or_default(),
                                             content: content.read().clone(),
                                             oninput: move |c| content.set(c),
                                         }
@@ -492,7 +542,7 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                         div { style: "height: 1px; width: 40px; background: {c.border}; margin-bottom: 32px;" }
                                         textarea { value: "{content}", oninput: move |e| content.set(e.value()),
                                             spellcheck: false,
-                                            style: "width: 100%; min-height: 60vh; background: transparent; border: none; color: {c.text_primary}; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; resize: none; outline: none; tab-size: 2;",
+                                            style: "width: 100%; flex: 1; background: transparent; border: none; color: {c.text_primary}; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; resize: none; outline: none; tab-size: 2;",
                                         }
                                         div { style: "padding: 4px 8px; background: {c.bg_canvas}; border-top: 1px solid {c.border}; display: flex; font-size: 11px; font-family: 'JetBrains Mono', monospace;",
                                             span { style: "color: {c.accent_green}; font-weight: 700;", "INSERT" }
@@ -506,9 +556,43 @@ pub fn Workspace(db: Option<SharedDb>, on_lock: EventHandler<()>) -> Element {
                                 x: format_menu_pos.read().0,
                                 y: format_menu_pos.read().1,
                                 on_close: move |_| show_format_menu.set(false),
-                                on_insert: move |ins: String| {
-                                    let cur = content.read().clone();
-                                    content.set(format!("{}\n{}", cur, ins));
+                                on_action: move |(label, ins): (String, String)| {
+                                    if label.starts_with("Mode: ") {
+                                        let target_mode = label.strip_prefix("Mode: ").unwrap_or("RichText");
+                                        let static_mode = match target_mode {
+                                            "RichText" => "RichText",
+                                            "Code" => "Code",
+                                            "Vim" => "Vim",
+                                            "Sheet" => "Sheet",
+                                            "Board" => "Board",
+                                            _ => "RichText",
+                                        };
+                                        mode.set(static_mode);
+                                    } else if mode() == "RichText" {
+                                        let js_cmd = match label.as_str() {
+                                            "Bold" => Some(("bold", "null")),
+                                            "Italic" => Some(("italic", "null")),
+                                            "Underline" => Some(("underline", "null")),
+                                            "Heading 1" => Some(("formatBlock", "'<h1>'")),
+                                            "Heading 2" => Some(("formatBlock", "'<h2>'")),
+                                            "Heading 3" => Some(("formatBlock", "'<h3>'")),
+                                            "Bullet List" => Some(("insertUnorderedList", "null")),
+                                            "Numbered List" => Some(("insertOrderedList", "null")),
+                                            "Task List" => Some(("insertTaskList", "null")),
+                                            "Quote" => Some(("formatBlock", "'<blockquote>'")),
+                                            "Code Block" => Some(("formatBlock", "'<pre>'")),
+                                            "Horizontal Rule" => Some(("insertHorizontalRule", "null")),
+                                            "Table" => Some(("insertHTML", "'<table style=\"width:100%; border-collapse:collapse; margin:16px 0;\"><thead><tr><th style=\"border:1px solid var(--border); padding:8px;\">Header 1</th><th style=\"border:1px solid var(--border); padding:8px;\">Header 2</th></tr></thead><tbody><tr><td style=\"border:1px solid var(--border); padding:8px;\">Cell 1</td><td style=\"border:1px solid var(--border); padding:8px;\">Cell 2</td></tr></tbody></table>'")),
+                                            _ => None,
+                                        };
+                                        if let Some((cmd, val)) = js_cmd {
+                                            let eval_str = format!("window.executeEditorCommand('{}', {});", cmd, val);
+                                            let _ = eval(&eval_str);
+                                        }
+                                    } else {
+                                        let cur = content.read().clone();
+                                        content.set(format!("{}\n{}", cur, ins));
+                                    }
                                     show_format_menu.set(false);
                                 }
                             }
@@ -616,7 +700,7 @@ fn ModeBtn(label: String, active: bool, onclick: EventHandler<()>) -> Element {
     };
     let color = if active { c.accent } else { c.text_secondary };
     rsx! {
-        button { style: "padding: 4px 8px; border-radius: 2px; background: {bg}; color: {color}; border: none; cursor: pointer;",
+        button { style: "padding: 5px 10px; border-radius: 4px; background: {bg}; color: {color}; border: 1px solid transparent; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1;",
             onclick: move |_| onclick.call(()), "{label}"
         }
     }

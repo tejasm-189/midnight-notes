@@ -10,7 +10,8 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 | `mod.rs` | ✅ done | Module root, error types |
 | `note.rs` | ✅ done | Note CRUD service (create, read, update, delete, trash, pin, archive, FTS5 search) |
 | `tag.rs` | ✅ done | Tag CRUD + tree operations + note-tag assignment |
-| `markdown.rs` | ✅ done | Markdown renderer (pulldown-cmark), plain text extractor, link parser |
+| `markdown.rs` | ✅ done | Markdown renderer (pulldown-cmark with Strikethrough enablement), plain text extractor, link parser |
+| `seeder.rs` | ✅ done | Automatic note data cleaning and fresh seeder engine |
 | `search.rs` | ✅ done | FTS5 search with tag:/has:todo/path: filters + smart views |
 | `backlinks.rs` | ✅ done | [[Note]] backlink extraction, resolution, linked mentions |
 | `history.rs` | ✅ done | Version snapshots: list, get, restore, diff between versions |
@@ -20,7 +21,7 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 ## Sub-folders
 
 | Folder | Status | Description |
-|--------|--------|-------------|
+|------|--------|-------------|
 | `plugin/` | ✅ done | WASM plugin host (wasmtime), manager, API types |
 
 ## Progress
@@ -36,6 +37,7 @@ All application business logic. No Dioxus imports allowed. Pure Rust services fo
 - [x] WASM plugin host + manager + file watcher
 - [x] Unit tests: 97 unit + 9 integration + 2 doc = 108
 - [x] Encryption: Argon2id key derivation, XChaCha20-Poly1305 encrypt/decrypt
+- [x] Data seeding: Automated cleaning and fresh startup seed database seeder
 
 ## Notes
 - Must not import Dioxus or Tauri types
